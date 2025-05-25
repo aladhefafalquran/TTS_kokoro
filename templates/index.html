@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTS KOKORO - Piper Text Reader</title>
+    <title>TTS KOKORO - Complete Audio Solution</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -19,7 +19,7 @@
             --success-color: #28a745;
             --danger-color: #dc3545;
             --warning-color: #ffc107;
-            --info-color: #17a2b8; /* Added for notifications */
+            --info-color: #17a2b8;
             --gradient-start: #6a11cb;
             --gradient-end: #2575fc;
         }
@@ -57,7 +57,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             padding: 40px;
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             box-sizing: border-box;
             border: 1px solid var(--border-color);
             transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
@@ -160,6 +160,66 @@
             border-color: var(--danger-color);
         }
 
+        /* NEW: STT Specific Styles */
+        .stt-section {
+            border: 2px solid var(--info-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(23, 162, 184, 0.05));
+        }
+
+        body.dark-mode .stt-section {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(33, 150, 243, 0.05));
+            border-color: var(--info-color);
+        }
+
+        .recording-indicator {
+            display: none;
+            color: var(--danger-color);
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .file-drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            color: var(--secondary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(74, 107, 175, 0.05);
+        }
+
+        .file-drop-zone:hover,
+        .file-drop-zone.dragover {
+            border-color: var(--primary-color);
+            background: rgba(74, 107, 175, 0.1);
+            color: var(--primary-color);
+        }
+
+        .transcription-result {
+            background: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        body.dark-mode .transcription-result {
+            background: #2a2a2a;
+            border-color: #444;
+        }
+
+        /* Enhanced notification styles */
         .notification-container {
             position: fixed;
             top: 20px;
@@ -195,6 +255,10 @@
             background-color: var(--danger-color);
         }
 
+        .notification.info {
+            background-color: var(--info-color);
+        }
+
         #readingStatus {
             margin-top: 15px;
             font-size: 0.9rem;
@@ -209,7 +273,7 @@
             margin-top: 10px;
             height: 10px;
             overflow: hidden;
-            cursor: pointer; /* Make progress bar clickable for scrubbing */
+            cursor: pointer;
         }
 
         .progress-bar {
@@ -229,7 +293,7 @@
             border: 1px solid var(--border-color);
             border-radius: 10px;
             background-color: var(--light-bg);
-            flex-wrap: wrap; /* Allow wrapping for smaller screens */
+            flex-wrap: wrap;
         }
 
         body.dark-mode .audio-controls {
@@ -246,87 +310,6 @@
         .volume-control-container input[type="range"] {
             width: 80px;
             margin: 0;
-        }
-
-        .voice-info {
-            font-size: 0.8rem;
-            color: var(--secondary-color);
-            margin-left: 10px;
-        }
-
-        .favorite-voice-btn {
-            background: none;
-            border: none;
-            color: #ccc;
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0 5px;
-            transition: color 0.2s ease;
-        }
-
-        .favorite-voice-btn.favorited {
-            color: var(--warning-color);
-        }
-
-        .voice-option-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .voice-option-wrapper .voice-preview-btn {
-            margin-left: auto; /* Push to the right */
-            font-size: 0.8rem;
-            padding: 2px 8px;
-            border-radius: 5px;
-            background-color: var(--info-color);
-            color: var(--light-text);
-            border: none;
-            cursor: pointer;
-        }
-
-        .voice-option-wrapper .voice-preview-btn:hover {
-            opacity: 0.8;
-        }
-
-        .template-dropdown,
-        .history-dropdown,
-        .snippets-dropdown {
-            margin-bottom: 15px;
-        }
-
-        .dropdown-menu {
-            max-height: 200px;
-            overflow-y: auto;
-            border-radius: 8px;
-            background-color: var(--light-bg);
-            border: 1px solid var(--border-color);
-        }
-        body.dark-mode .dropdown-menu {
-            background-color: #2a2a2a;
-            border-color: #444;
-        }
-
-        .dropdown-item {
-            color: var(--dark-text);
-            padding: 8px 15px;
-            transition: background-color 0.2s ease;
-        }
-        body.dark-mode .dropdown-item {
-            color: var(--dark-text);
-        }
-
-        .dropdown-item:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        body.dark-mode .dropdown-item:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .form-check-label {
-            color: var(--dark-text);
         }
 
         #dark-mode-toggle-container {
@@ -383,93 +366,44 @@
             transform: translateX(22px);
         }
 
-        /* Batch processing UI */
-        #batch-queue-container {
-            margin-top: 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 15px;
-            background-color: var(--light-bg);
+        /* Workflow tabs */
+        .workflow-tabs {
+            margin-bottom: 20px;
         }
-        body.dark-mode #batch-queue-container {
-            background-color: #2a2a2a;
+
+        .workflow-tabs .nav-link {
+            color: var(--dark-text);
+            border: 1px solid var(--border-color);
+            background: var(--light-bg);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .workflow-tabs .nav-link {
+            background: #2a2a2a;
             border-color: #444;
         }
 
-        #batch-queue-list {
-            list-style: none;
-            padding: 0;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        #batch-queue-list li {
-            padding: 8px 0;
-            border-bottom: 1px dashed var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #batch-queue-list li:last-child {
-            border-bottom: none;
-        }
-
-        .loading-dots span {
-            animation: wave 1.4s infinite;
-            animation-delay: calc(0.1s * var(--i));
-            display: inline-block;
-            margin: 0 1px;
-            font-weight: bold;
-        }
-
-        @keyframes wave {
-            0%, 60%, 100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-5px);
-            }
-        }
-        
-        .drag-drop-area {
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            margin-top: 15px;
-            color: var(--secondary-color);
-            cursor: pointer;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
-
-        .drag-drop-area:hover {
-            background-color: rgba(74, 107, 175, 0.1);
+        .workflow-tabs .nav-link.active {
+            background: var(--primary-color);
+            color: white;
             border-color: var(--primary-color);
         }
-        
-        /* Fullscreen mode specific styles */
-        body.fullscreen-mode {
-            background-color: var(--light-bg);
-            display: block;
-            min-height: 100vh;
-            padding: 0;
+
+        .workflow-tabs .nav-link:hover {
+            background: var(--primary-hover);
+            color: white;
+            border-color: var(--primary-hover);
         }
-        body.fullscreen-mode .app-container {
-            width: 100%;
-            max-width: 100%;
-            height: 100vh;
-            border-radius: 0;
-            box-shadow: none;
-            padding: 20px;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        body.fullscreen-mode .text-input {
-            flex-grow: 1; /* Make text area fill available space */
-            min-height: 200px; /* Minimum height for text area */
-            margin-bottom: 15px;
+
+        /* Language detection badge */
+        .language-badge {
+            display: inline-block;
+            background: var(--info-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -485,182 +419,225 @@
 
     <div class="app-container">
         <h1 class="mb-4">
-            <img src="/static/logo.png" alt="KOKORO Logo" height="60" class="me-2"> TTS KOKORO
+            <i class="fas fa-microphone-alt"></i> TTS KOKORO
+            <small class="text-muted d-block" style="font-size: 0.5em;">Complete Audio Solution</small>
         </h1>
 
         <div class="notification-container" id="notificationContainer"></div>
 
-        <div class="mb-3">
-            <label for="textInput" class="form-label">Text to Speak <span id="charCount" class="text-muted small ms-2">0 characters</span></label>
-            <textarea class="form-control text-input" id="textInput" rows="8" placeholder="Enter text here..."></textarea>
-            <div class="d-flex justify-content-between align-items-center mt-2">
-                <div>
-                    <button class="btn btn-secondary btn-sm" id="copyTextBtn" aria-label="Copy text to clipboard">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
-                    <button class="btn btn-secondary btn-sm ms-2" id="clearTextBtn" aria-label="Clear text area">
-                        <i class="fas fa-eraser"></i> Clear
-                    </button>
-                </div>
-                <div>
-                    <input type="file" id="fileImport" class="d-none" accept=".txt, .pdf, .docx">
-                    <button class="btn btn-secondary btn-sm" id="importFileBtn" aria-label="Import text from file">
-                        <i class="fas fa-file-upload"></i> Import File
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="drag-drop-area d-none" id="dragDropArea">
-            <p><i class="fas fa-cloud-upload-alt fa-2x"></i></p>
-            <p>Drag & Drop .txt, .pdf, or .docx files here</p>
-            <p class="small text-muted">(or click to select file)</p>
-        </div>
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <label for="voiceSelect" class="form-label">Select Voice</label>
-                <select class="form-select" id="voiceSelect" aria-label="Select voice for speech synthesis">
-                    <optgroup label="Piper Voices">
-                        {% for voice in piper_voices %}
-                        <option value="piper:{{ voice.id }}" data-language="{{ voice.language }}" data-gender="{{ voice.gender }}">
-                            <span class="voice-name">{{ voice.name }}</span>
-                            <span class="voice-info">({{ voice.language }} - {{ voice.gender }})</span>
-                        </option>
-                        {% endfor %}
-                    </optgroup>
-                </select>
-                <div class="mt-2 text-end">
-                    <button class="btn btn-sm btn-info voice-preview-btn" id="voicePreviewBtn" aria-label="Preview selected voice">
-                        <i class="fas fa-play"></i> Preview Voice
-                    </button>
-                    <button class="btn btn-sm favorite-voice-btn" id="favoriteVoiceBtn" aria-label="Favorite selected voice">
-                        <i class="fas fa-star"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <label for="speedSelect" class="form-label">Speed</label>
-                <select class="form-select" id="speedSelect" aria-label="Select playback speed">
-                    <option value="0.75">0.75x</option>
-                    <option value="1.0" selected>1.0x (Normal)</option>
-                    <option value="1.25">1.25x</option>
-                    <option value="1.5">1.5x</option>
-                    <option value="1.75">1.75x</option>
-                    <option value="2.0">2.0x</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="outputFormatSelect" class="form-label">Output Format</label>
-                <select class="form-select" id="outputFormatSelect" aria-label="Select audio output format">
-                    <option value="wav" selected>WAV</option>
-                    <option value="mp3">MP3</option>
-                    <option value="ogg">OGG</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-4">
-                <div class="dropdown template-dropdown">
-                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="templatesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-file-alt"></i> Text Templates
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="templatesDropdown" id="templatesList">
-                        <li><a class="dropdown-item" href="#" data-template="Welcome message">Welcome message</a></li>
-                        <li><a class="dropdown-item" href="#" data-template="Announcement">Announcement</a></li>
-                        <li><a class="dropdown-item" href="#" data-template="Error message">Error message</a></li>
-                        <li><a class="dropdown-item" href="#" data-template="Quick test">Quick test</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="dropdown history-dropdown">
-                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="historyDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-history"></i> Playback History
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="historyDropdown" id="historyList">
-                        <li><a class="dropdown-item disabled" href="#">No history yet...</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="dropdown snippets-dropdown">
-                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="snippetsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-bookmark"></i> Saved Snippets
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="snippetsDropdown" id="snippetsList">
-                        <li><a class="dropdown-item disabled" href="#">No snippets saved...</a></li>
-                    </ul>
-                </div>
-                <div class="mt-2 text-end">
-                    <button class="btn btn-sm btn-secondary" id="saveSnippetBtn" aria-label="Save current text as snippet">
-                        <i class="fas fa-save"></i> Save Snippet
-                    </button>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="d-grid gap-2 mb-3">
-            <button class="btn btn-primary btn-lg" id="readBtn" aria-label="Read text aloud">
-                <i class="fas fa-volume-up"></i> Read Text
-            </button>
-        </div>
-
-        <div id="readingStatus" class="text-center text-muted">
-            <i class="fas fa-circle-notch fa-spin"></i> Initializing...
-        </div>
-
-        <div class="audio-controls" id="audioControls" style="display:none;">
-            <audio id="audioPlayer" controls style="display:none;"></audio>
-            <button class="btn btn-secondary" id="playPauseBtn" aria-label="Play/Pause audio">
-                <i class="fas fa-play"></i>
-            </button>
-            <button class="btn btn-danger" id="stopBtn" disabled aria-label="Stop audio playback">
-                <i class="fas fa-stop"></i>
-            </button>
-            <div class="progress-container flex-grow-1" id="progressBarContainer" aria-label="Audio progress bar">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-            <div class="volume-control-container">
-                <i class="fas fa-volume-up"></i>
-                <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1" aria-label="Volume control">
-            </div>
-            <button class="btn btn-success" id="downloadAudioBtn" disabled aria-label="Download generated audio">
-                <i class="fas fa-download"></i> Download
-            </button>
-        </div>
-
-        <div id="batch-queue-container" class="mt-4">
-            <h5><i class="fas fa-layer-group"></i> Batch Processing Queue</h5>
-            <div class="d-flex gap-2 mb-3">
-                <button class="btn btn-sm btn-secondary" id="addToBatchBtn" aria-label="Add current text to batch queue">
-                    <i class="fas fa-plus-circle"></i> Add to Batch
+        <ul class="nav nav-tabs workflow-tabs" id="workflowTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="stt-tab" data-bs-toggle="tab" data-bs-target="#stt-content" type="button" role="tab" aria-controls="stt-content" aria-selected="true">
+                    <i class="fas fa-microphone"></i> Speech → Text
                 </button>
-                <button class="btn btn-sm btn-primary" id="processBatchBtn" aria-label="Process batch queue">
-                    <i class="fas fa-play-circle"></i> Process Batch
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit-content" type="button" role="tab" aria-controls="edit-content" aria-selected="false">
+                    <i class="fas fa-edit"></i> Edit Text
                 </button>
-                <button class="btn btn-sm btn-danger" id="clearBatchBtn" aria-label="Clear batch queue">
-                    <i class="fas fa-trash-alt"></i> Clear Batch
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tts-tab" data-bs-toggle="tab" data-bs-target="#tts-content" type="button" role="tab" aria-controls="tts-content" aria-selected="false">
+                    <i class="fas fa-volume-up"></i> Text → Speech
                 </button>
-            </div>
-            <ul id="batch-queue-list">
-                <li class="text-muted">Queue is empty.</li>
-            </ul>
-        </div>
-        
-        <div class="text-center mt-4">
-            <button class="btn btn-secondary btn-sm" id="fullscreenBtn" aria-label="Toggle fullscreen mode">
-                <i class="fas fa-expand"></i> Fullscreen
-            </button>
-        </div>
+            </li>
+        </ul>
 
+        <div class="tab-content" id="workflowTabContent">
+
+            <div class="tab-pane fade show active" id="stt-content" role="tabpanel" aria-labelledby="stt-tab">
+                <div class="stt-section">
+                    <h4><i class="fas fa-microphone"></i> Speech to Text</h4>
+                    <p class="text-muted">Convert audio to text using AI transcription</p>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Upload Audio File</label>
+                            <div class="file-drop-zone" id="audioDropZone">
+                                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                <p>Drag & drop audio files here</p>
+                                <p class="small">Supports: MP3, WAV, OGG, M4A, FLAC</p>
+                                <button class="btn btn-info btn-sm mt-2" id="selectAudioBtn">
+                                    <i class="fas fa-folder-open"></i> Select File
+                                </button>
+                            </div>
+                            <input type="file" id="audioFileInput" class="d-none" accept=".mp3,.wav,.ogg,.m4a,.flac,.webm">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Live Recording</label>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-danger" id="recordBtn">
+                                    <i class="fas fa-microphone"></i> Start Recording
+                                </button>
+                                <button class="btn btn-secondary" id="stopRecordBtn" disabled>
+                                    <i class="fas fa-stop"></i> Stop Recording
+                                </button>
+                                <div class="recording-indicator" id="recordingIndicator">
+                                    <i class="fas fa-circle"></i> Recording...
+                                </div>
+                            </div>
+                            <small class="text-muted">Uses browser's speech recognition</small>
+                        </div>
+                    </div>
+
+                    <div class="transcription-result" id="transcriptionResult">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6><i class="fas fa-file-alt"></i> Transcription Result</h6>
+                            <div>
+                                <span class="language-badge" id="detectedLanguage" style="display: none;"></span>
+                                <button class="btn btn-success btn-sm" id="useTranscriptionBtn">
+                                    <i class="fas fa-arrow-right"></i> Use This Text
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-floating">
+                            <textarea class="form-control" id="transcriptionText" style="height: 120px;" readonly></textarea>
+                            <label for="transcriptionText">Transcribed text will appear here...</label>
+                        </div>
+                        <div class="mt-2 small text-muted">
+                            <span id="transcriptionStats"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div id="sttStatus" class="text-center text-muted">
+                            <i class="fas fa-info-circle"></i> Ready for speech recognition
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="edit-content" role="tabpanel" aria-labelledby="edit-tab">
+                <div class="mb-3">
+                    <label for="textInput" class="form-label">Text to Speak <span id="charCount" class="text-muted small ms-2">0 characters</span></label>
+                    <textarea class="form-control text-input" id="textInput" rows="8" placeholder="Enter text here, or get text from Speech → Text tab..."></textarea>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div>
+                            <button class="btn btn-secondary btn-sm" id="copyTextBtn">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <button class="btn btn-secondary btn-sm ms-2" id="clearTextBtn">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                        </div>
+                        <div>
+                            <input type="file" id="fileImport" class="d-none" accept=".txt">
+                            <button class="btn btn-secondary btn-sm" id="importFileBtn">
+                                <i class="fas fa-file-upload"></i> Import .txt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="templatesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-file-alt"></i> Templates
+                            </button>
+                            <ul class="dropdown-menu" id="templatesList" aria-labelledby="templatesDropdown">
+                                <li><a class="dropdown-item" href="#" data-template="Welcome message">Welcome message</a></li>
+                                <li><a class="dropdown-item" href="#" data-template="Announcement">Announcement</a></li>
+                                <li><a class="dropdown-item" href="#" data-template="Quick test">Quick test</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="historyDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-history"></i> History
+                            </button>
+                            <ul class="dropdown-menu" id="historyList" aria-labelledby="historyDropdown">
+                                <li><a class="dropdown-item disabled" href="#">No history yet...</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="snippetsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bookmark"></i> Snippets
+                            </button>
+                            <ul class="dropdown-menu" id="snippetsList" aria-labelledby="snippetsDropdown">
+                                <li><a class="dropdown-item disabled" href="#">No snippets saved...</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tts-content" role="tabpanel" aria-labelledby="tts-tab">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="voiceSelect" class="form-label">Select Voice</label>
+                        <select class="form-select" id="voiceSelect" aria-label="Select Voice">
+                            <optgroup label="Piper Voices">
+                                {% for voice in piper_voices %}
+                                <option value="piper:{{ voice.id }}" data-language="{{ voice.language }}" data-gender="{{ voice.gender }}">
+                                    {{ voice.name }} ({{ voice.language }} - {{ voice.gender }})
+                                </option>
+                                {% endfor %}
+                            </optgroup>
+                        </select>
+                        <div class="mt-2 text-end">
+                            <button class="btn btn-sm btn-info" id="voicePreviewBtn">
+                                <i class="fas fa-play"></i> Preview
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="speedSelect" class="form-label">Speed</label>
+                        <select class="form-select" id="speedSelect" aria-label="Select Speed">
+                            <option value="0.75">0.75x</option>
+                            <option value="1.0" selected>1.0x (Normal)</option>
+                            <option value="1.25">1.25x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2.0">2.0x</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="outputFormatSelect" class="form-label">Format</label>
+                        <select class="form-select" id="outputFormatSelect" aria-label="Select Format">
+                            <option value="wav" selected>WAV</option>
+                            <option value="mp3">MP3</option>
+                            <option value="ogg">OGG</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-grid gap-2 mb-3">
+                    <button class="btn btn-primary btn-lg" id="readBtn">
+                        <i class="fas fa-volume-up"></i> Generate Speech
+                    </button>
+                </div>
+                <div id="readingStatus" class="text-center text-muted">
+                    <i class="fas fa-circle-notch fa-spin"></i> Initializing...
+                </div>
+                <div class="audio-controls" id="audioControls" style="display:none;">
+                    <audio id="audioPlayer" controls style="display:none;"></audio>
+                    <button class="btn btn-secondary" id="playPauseBtn">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="btn btn-danger" id="stopBtn" disabled>
+                        <i class="fas fa-stop"></i>
+                    </button>
+                    <div class="progress-container flex-grow-1" id="progressBarContainer">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="volume-control-container">
+                        <i class="fas fa-volume-up"></i>
+                        <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1">
+                    </div>
+                    <button class="btn btn-success" id="downloadAudioBtn" disabled>
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // --- Element References ---
             const textInput = document.getElementById('textInput');
             const readBtn = document.getElementById('readBtn');
             const stopBtn = document.getElementById('stopBtn');
@@ -682,41 +659,40 @@
             const volumeControl = document.getElementById('volumeControl');
             const audioControls = document.getElementById('audioControls');
             const voicePreviewBtn = document.getElementById('voicePreviewBtn');
-            const favoriteVoiceBtn = document.getElementById('favoriteVoiceBtn');
-            const templatesList = document.getElementById('templatesList');
-            const historyList = document.getElementById('historyList');
-            const snippetsList = document.getElementById('snippetsList');
-            const saveSnippetBtn = document.getElementById('saveSnippetBtn');
-            const importFileBtn = document.getElementById('importFileBtn');
-            const fileImport = document.getElementById('fileImport');
-            const dragDropArea = document.getElementById('dragDropArea');
-            const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-            // Batch Processing elements
-            const addToBatchBtn = document.getElementById('addToBatchBtn');
-            const processBatchBtn = document.getElementById('processBatchBtn');
-            const clearBatchBtn = document.getElementById('clearBatchBtn');
-            const batchQueueList = document.getElementById('batch-queue-list');
-            let batchQueue = []; // Array to hold texts for batch processing
+            // NEW: STT Elements
+            const audioDropZone = document.getElementById('audioDropZone');
+            const selectAudioBtn = document.getElementById('selectAudioBtn');
+            const audioFileInput = document.getElementById('audioFileInput');
+            const recordBtn = document.getElementById('recordBtn');
+            const stopRecordBtn = document.getElementById('stopRecordBtn');
+            const recordingIndicator = document.getElementById('recordingIndicator');
+            const transcriptionResult = document.getElementById('transcriptionResult');
+            const transcriptionText = document.getElementById('transcriptionText');
+            const detectedLanguage = document.getElementById('detectedLanguage');
+            const useTranscriptionBtn = document.getElementById('useTranscriptionBtn');
+            const transcriptionStats = document.getElementById('transcriptionStats');
+            const sttStatus = document.getElementById('sttStatus');
 
+            // Global variables
             let currentAudio = null;
             let isReading = false;
             let isPaused = false;
             let currentDownloadPath = null;
-            let currentVoiceInfo = {}; // Stores language, gender for selected voice
+            let isRecording = false;
+            let recognition = null;
+            let sttAvailable = false;
+            let accumulatedTranscript = ''; // NEW: To store continuous transcription
 
             // --- Utility Functions ---
-
             function showNotification(message, type = 'info', duration = 3000) {
                 const notification = document.createElement('div');
                 notification.classList.add('notification', type);
                 notification.textContent = message;
                 notificationContainer.appendChild(notification);
-
                 setTimeout(() => {
                     notification.classList.add('show');
-                }, 10); // Small delay to trigger CSS transition
-
+                }, 10);
                 setTimeout(() => {
                     notification.classList.remove('show');
                     notification.addEventListener('transitionend', () => notification.remove());
@@ -725,6 +701,10 @@
 
             function updateReadingStatus(message, icon = 'fas fa-circle-notch fa-spin') {
                 readingStatus.innerHTML = `<i class="${icon}"></i> ${message}`;
+            }
+
+            function updateSTTStatus(message, icon = 'fas fa-info-circle') {
+                sttStatus.innerHTML = `<i class="${icon}"></i> ${message}`;
             }
 
             // --- Dark Mode ---
@@ -739,7 +719,6 @@
                 localStorage.setItem('darkMode', isDark);
             }
 
-            // Load dark mode preference
             const savedDarkMode = localStorage.getItem('darkMode');
             if (savedDarkMode === 'true') {
                 darkmodeToggleCheckbox.checked = true;
@@ -754,20 +733,16 @@
             });
 
             // --- Text Management ---
-
-            // Character Counter
             textInput.addEventListener('input', function () {
                 const count = this.value.length;
                 charCount.textContent = `${count} characters`;
-                saveTextToLocalStorage(); // Auto-save
+                saveTextToLocalStorage();
             });
 
-            // Auto-save text to localStorage
             function saveTextToLocalStorage() {
                 localStorage.setItem('ttsKokoroTextInput', textInput.value);
             }
 
-            // Load text from localStorage
             function loadTextFromLocalStorage() {
                 const savedText = localStorage.getItem('ttsKokoroTextInput');
                 if (savedText) {
@@ -775,725 +750,561 @@
                     charCount.textContent = `${savedText.length} characters`;
                 }
             }
+            loadTextFromLocalStorage();
 
-            loadTextFromLocalStorage(); // Load on startup
-
-            // Copy to Clipboard
             copyTextBtn.addEventListener('click', function () {
                 navigator.clipboard.writeText(textInput.value).then(() => {
                     showNotification('Text copied to clipboard!', 'success');
                 }).catch(err => {
-                    console.error('Failed to copy text: ', err);
                     showNotification('Failed to copy text.', 'error');
                 });
             });
 
-            // Clear Text Button
             clearTextBtn.addEventListener('click', function () {
-                if (confirm('Are you sure you want to clear all text? This cannot be undone.')) {
+                if (confirm('Clear all text?')) {
                     textInput.value = '';
-                    textInput.focus();
                     charCount.textContent = `0 characters`;
-                    saveTextToLocalStorage(); // Clear saved text
-                    showNotification('Text area cleared!', 'info');
-                }
-            });
-
-            // Text Templates
-            templatesList.addEventListener('click', function (event) {
-                const templateText = event.target.dataset.template;
-                if (templateText) {
-                    let content = '';
-                    switch (templateText) {
-                        case "Welcome message":
-                            content = "Hello! Welcome to TTS KOKORO, your ultimate text-to-speech companion. Enjoy generating high-quality audio!";
-                            break;
-                        case "Announcement":
-                            content = "Attention all users: We have just released new features including enhanced audio controls and dark mode. Update your application for the best experience.";
-                            break;
-                        case "Error message":
-                            content = "Error: Unable to process your request. Please check your internet connection or try again later. If the problem persists, contact support.";
-                            break;
-                        case "Quick test":
-                            content = "This is a quick test of the selected voice. The quick brown fox jumps over the lazy dog.";
-                            break;
-                    }
-                    textInput.value = content;
-                    charCount.textContent = `${content.length} characters`;
                     saveTextToLocalStorage();
-                    showNotification(`Loaded template: "${templateText}"`, 'info');
+                    showNotification('Text cleared!', 'info');
                 }
             });
 
-            // Save/Load Snippets
-            function saveSnippet(text) {
-                let snippets = JSON.parse(localStorage.getItem('textSnippets') || '[]');
-                const snippetName = prompt("Enter a name for this snippet:");
-                if (snippetName && text.trim() !== "") {
-                    snippets.unshift({ name: snippetName, text: text, timestamp: Date.now() });
-                    localStorage.setItem('textSnippets', JSON.stringify(snippets));
-                    loadSnippets(); // Reload snippets list
-                    showNotification(`Snippet "${snippetName}" saved!`, 'success');
-                } else if (text.trim() === "") {
-                    showNotification("Cannot save empty text as a snippet.", "warning");
-                }
-            }
+            // --- NEW: Speech-to-Text Functions ---
 
-            function loadSnippets() {
-                const snippets = JSON.parse(localStorage.getItem('textSnippets') || '[]');
-                snippetsList.innerHTML = '';
-                if (snippets.length === 0) {
-                    snippetsList.innerHTML = '<li><a class="dropdown-item disabled" href="#">No snippets saved...</a></li>';
-                    return;
-                }
-                snippets.forEach((snippet, index) => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" data-snippet-index="${index}">
-                            ${snippet.name} <i class="fas fa-trash-alt text-danger ms-2" data-action="delete-snippet"></i>
-                        </a>
-                    `;
-                    snippetsList.appendChild(li);
-                });
-            }
-
-            snippetsList.addEventListener('click', function (event) {
-                const target = event.target;
-                if (target.dataset.action === 'delete-snippet') {
-                    event.preventDefault();
-                    event.stopPropagation(); // Prevent loading the snippet if delete button clicked
-                    const index = target.closest('[data-snippet-index]').dataset.snippetIndex;
-                    let snippets = JSON.parse(localStorage.getItem('textSnippets') || '[]');
-                    const snippetName = snippets[index].name;
-                    if (confirm(`Are you sure you want to delete snippet "${snippetName}"?`)) {
-                        snippets.splice(index, 1);
-                        localStorage.setItem('textSnippets', JSON.stringify(snippets));
-                        loadSnippets();
-                        showNotification(`Snippet "${snippetName}" deleted.`, 'info');
-                    }
-                } else if (target.dataset.snippetIndex !== undefined) {
-                    event.preventDefault();
-                    const index = target.dataset.snippetIndex;
-                    const snippets = JSON.parse(localStorage.getItem('textSnippets') || '[]');
-                    if (snippets[index]) {
-                        textInput.value = snippets[index].text;
-                        charCount.textContent = `${snippets[index].text.length} characters`;
-                        saveTextToLocalStorage();
-                        showNotification(`Loaded snippet: "${snippets[index].name}"`, 'info');
-                    }
-                }
-            });
-
-            saveSnippetBtn.addEventListener('click', () => saveSnippet(textInput.value));
-            loadSnippets(); // Load snippets on startup
-
-            // File Import
-            importFileBtn.addEventListener('click', () => {
-                fileImport.click(); // Trigger the hidden file input
-            });
-
-            fileImport.addEventListener('change', handleFileSelect);
-            dragDropArea.addEventListener('click', () => fileImport.click()); // Click to select file
-
-            dragDropArea.addEventListener('dragover', (event) => {
-                event.preventDefault();
-                dragDropArea.style.borderColor = varCss('--primary-color');
-                dragDropArea.style.backgroundColor = 'rgba(74, 107, 175, 0.1)';
-            });
-
-            dragDropArea.addEventListener('dragleave', () => {
-                dragDropArea.style.borderColor = varCss('--border-color');
-                dragDropArea.style.backgroundColor = 'transparent';
-            });
-
-            dragDropArea.addEventListener('drop', (event) => {
-                event.preventDefault();
-                dragDropArea.style.borderColor = varCss('--border-color');
-                dragDropArea.style.backgroundColor = 'transparent';
-                handleFileSelect({ target: { files: event.dataTransfer.files } });
-            });
-
-            function handleFileSelect(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const content = e.target.result;
-                    const fileExtension = file.name.split('.').pop().toLowerCase();
-
-                    if (fileExtension === 'txt') {
-                        textInput.value = content;
-                        charCount.textContent = `${content.length} characters`;
-                        saveTextToLocalStorage();
-                        showNotification(`Loaded .txt file: ${file.name}`, 'success');
-                    } else if (fileExtension === 'pdf' || fileExtension === 'docx') {
-                        // For .pdf and .docx, this is client-side JS.
-                        // Actual text extraction for these formats usually requires a backend library.
-                        // Inform the user that full support requires backend.
-                        showNotification(`Cannot directly read .${fileExtension} files in browser. Please use a .txt file or note that this feature requires backend support.`, 'warning', 7000);
-                        // Optionally, you could send the file to the backend for processing here.
-                    } else {
-                        showNotification(`Unsupported file type: .${fileExtension}`, 'warning');
-                    }
-                };
-
-                reader.onerror = function () {
-                    showNotification('Failed to read file!', 'error');
-                };
-
-                if (file.type === 'text/plain') {
-                    reader.readAsText(file);
-                } else if (file.type === 'application/pdf' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-                    // For backend processing, you'd send the file via Fetch API
-                    showNotification(`Attempting to load ${file.name}. Note: Advanced file types (.pdf, .docx) currently require server-side processing which is not fully implemented in this demo.`, 'info', 5000);
-                } else {
-                    showNotification('Please select a .txt, .pdf, or .docx file.', 'warning');
-                }
-            }
-
-
-            // --- Audio Playback Controls ---
-            playPauseBtn.addEventListener('click', togglePlayPause);
-            stopBtn.addEventListener('click', stopReading);
-            audioPlayer.addEventListener('timeupdate', updateProgressBar);
-            audioPlayer.addEventListener('ended', handleAudioEnded);
-            audioPlayer.addEventListener('pause', () => {
-                isPaused = true;
-                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-            });
-            audioPlayer.addEventListener('play', () => {
-                isPaused = false;
-                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            });
-
-            volumeControl.addEventListener('input', (event) => {
-                audioPlayer.volume = event.target.value;
-                localStorage.setItem('audioVolume', event.target.value); // Save volume preference
-            });
-
-            // Load saved volume preference
-            const savedVolume = localStorage.getItem('audioVolume');
-            if (savedVolume !== null) {
-                audioPlayer.volume = parseFloat(savedVolume);
-                volumeControl.value = parseFloat(savedVolume);
-            }
-
-            function togglePlayPause() {
-                if (currentAudio) {
-                    if (isPaused) {
-                        currentAudio.play();
-                    } else {
-                        currentAudio.pause();
-                    }
-                } else if (currentDownloadPath) {
-                    // If audio was stopped but path exists, try to play from start
-                    playAudio(currentDownloadPath);
-                } else {
-                    showNotification("No audio to play.", "warning");
-                }
-            }
-
-            function updateProgressBar() {
-                if (currentAudio && !isNaN(currentAudio.duration)) {
-                    const percentage = (currentAudio.currentTime / currentAudio.duration) * 100;
-                    progressBar.style.width = percentage + '%';
-                }
-            }
-
-            // Audio Scrubbing (Seek bar)
-            progressBarContainer.addEventListener('click', function (e) {
-                if (currentAudio && !isNaN(currentAudio.duration)) {
-                    const rect = progressBarContainer.getBoundingClientRect();
-                    const clickX = e.clientX - rect.left;
-                    const width = rect.width;
-                    const percentage = clickX / width;
-                    currentAudio.currentTime = currentAudio.duration * percentage;
-                }
-            });
-
-            function handleAudioEnded() {
-                stopReading(); // Call stop function to reset UI
-                showNotification("Audio playback finished.", "info");
-            }
-
-            function resetAudioControls() {
-                audioControls.style.display = 'none';
-                progressBar.style.width = '0%';
-                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-                stopBtn.disabled = true;
-                downloadAudioBtn.disabled = true;
-                currentAudio = null;
-                isReading = false;
-                isPaused = false;
-                currentDownloadPath = null;
-            }
-
-
-            // --- Voice Enhancement ---
-
-            // Voice Preview
-            voicePreviewBtn.addEventListener('click', async () => {
-                const selectedVoice = voiceSelect.value;
-                if (!selectedVoice) {
-                    showNotification('Please select a voice first.', 'warning');
-                    return;
-                }
-                const sampleText = "Hello! This is how I sound.";
-                updateReadingStatus("Generating voice preview...", 'fas fa-spinner fa-spin');
-                
+            // Check STT availability
+            async function checkSTTAvailability() {
                 try {
-                    const response = await fetch('/preview_voice', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ voice_id: selectedVoice, sample_text: sampleText })
-                    });
+                    const response = await fetch('/check_stt_availability');
                     const data = await response.json();
-
-                    if (data.success && data.audioPath) {
-                        showNotification('Voice preview ready!', 'success');
-                        playAudio(data.audioPath);
+                    sttAvailable = data.whisper_available;
+                    if (sttAvailable) {
+                        updateSTTStatus("STT ready - Upload audio or use microphone", 'fas fa-check-circle');
                     } else {
-                        showNotification(`Failed to preview voice: ${data.error || 'Unknown error'}`, 'error');
-                        updateReadingStatus("Failed to generate preview.", 'fas fa-exclamation-circle');
-                        resetAudioControls();
+                        updateSTTStatus("STT (Whisper) not available. See backend console for install info.", 'fas fa-exclamation-triangle');
+                        // Disable upload and record buttons if STT is not available
+                        selectAudioBtn.disabled = true;
+                        recordBtn.disabled = true;
+                        audioDropZone.style.pointerEvents = 'none';
+                        audioDropZone.style.opacity = '0.6';
                     }
                 } catch (error) {
-                    console.error('Error during voice preview:', error);
-                    showNotification('Network error during voice preview.', 'error');
-                    updateReadingStatus("Failed to generate preview.", 'fas fa-exclamation-circle');
-                    resetAudioControls();
+                    console.error('Error checking STT availability:', error);
+                    updateSTTStatus("Failed to check STT availability.", 'fas fa-times-circle');
+                    selectAudioBtn.disabled = true;
+                    recordBtn.disabled = true;
+                    audioDropZone.style.pointerEvents = 'none';
+                    audioDropZone.style.opacity = '0.6';
+                }
+            }
+
+            // Audio File Upload (Drag & Drop and Select File)
+            audioDropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                audioDropZone.classList.add('dragover');
+            });
+
+            audioDropZone.addEventListener('dragleave', () => {
+                audioDropZone.classList.remove('dragover');
+            });
+
+            audioDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                audioDropZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    processAudioFile(files[0]);
                 }
             });
 
-            // Favorite Voices
-            function getFavoriteVoices() {
-                return JSON.parse(localStorage.getItem('favoriteVoices') || '[]');
-            }
+            selectAudioBtn.addEventListener('click', () => {
+                audioFileInput.click();
+            });
 
-            function saveFavoriteVoices(favorites) {
-                localStorage.setItem('favoriteVoices', JSON.stringify(favorites));
-            }
-
-            function updateFavoriteButton() {
-                const selectedVoiceValue = voiceSelect.value;
-                const favorites = getFavoriteVoices();
-                if (favorites.includes(selectedVoiceValue)) {
-                    favoriteVoiceBtn.classList.add('favorited');
-                } else {
-                    favoriteVoiceBtn.classList.remove('favorited');
+            audioFileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    processAudioFile(e.target.files[0]);
                 }
-            }
+            });
 
-            favoriteVoiceBtn.addEventListener('click', () => {
-                const selectedVoiceValue = voiceSelect.value;
-                if (!selectedVoiceValue) {
-                    showNotification("Please select a voice to favorite.", "warning");
+            async function processAudioFile(file) {
+                if (!sttAvailable) {
+                    showNotification("Speech-to-Text feature is not available.", "error");
                     return;
                 }
-                let favorites = getFavoriteVoices();
-                if (favorites.includes(selectedVoiceValue)) {
-                    favorites = favorites.filter(v => v !== selectedVoiceValue);
-                    showNotification("Voice removed from favorites.", "info");
-                } else {
-                    favorites.push(selectedVoiceValue);
-                    showNotification("Voice added to favorites!", "success");
-                }
-                saveFavoriteVoices(favorites);
-                updateFavoriteButton(); // Update star icon immediately
-            });
 
-            // Update favorite button state when voice selection changes
-            voiceSelect.addEventListener('change', () => {
-                updateFavoriteButton();
-                // Update currentVoiceInfo
-                const selectedOption = voiceSelect.options[voiceSelect.selectedIndex];
-                currentVoiceInfo = {
-                    language: selectedOption.dataset.language,
-                    gender: selectedOption.dataset.gender
+                const formData = new FormData();
+                formData.append('audio_file', file);
+
+                updateSTTStatus('Transcribing audio...', 'fas fa-circle-notch fa-spin');
+                showNotification('Uploading and transcribing audio...', 'info');
+
+                try {
+                    const response = await fetch('/transcribe_audio', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to transcribe audio');
+                    }
+
+                    const data = await response.json();
+                    if (data.success && data.text) {
+                        transcriptionText.value = data.text;
+                        detectedLanguage.textContent = data.detected_language.toUpperCase();
+                        detectedLanguage.style.display = 'inline-block';
+                        transcriptionStats.textContent = `${data.character_count} characters`;
+                        transcriptionResult.style.display = 'block';
+                        updateSTTStatus('Transcription complete!', 'fas fa-check-circle');
+                        showNotification('Audio transcribed successfully!', 'success');
+                    } else {
+                        showNotification(data.error || 'Unknown error during transcription.', 'error');
+                        updateSTTStatus('Transcription failed.', 'fas fa-times-circle');
+                        transcriptionResult.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Transcription Error:', error);
+                    showNotification(`Error: ${error.message}`, 'error');
+                    updateSTTStatus('Transcription failed.', 'fas fa-times-circle');
+                    transcriptionResult.style.display = 'none';
+                }
+            }
+
+            // Live Recording
+            let mediaRecorder;
+            let audioChunks = [];
+
+            function initializeSpeechRecognition() {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                    recordBtn.disabled = true;
+                    updateSTTStatus("Browser does not support Web Speech API for live recording.", 'fas fa-exclamation-triangle');
+                    showNotification("Live recording not supported in this browser.", "warning", 5000);
+                    return;
+                }
+
+                recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US'; // Default language, could be made dynamic
+
+                recognition.onstart = () => {
+                    console.log('Speech recognition started');
+                    isRecording = true;
+                    recordBtn.disabled = true;
+                    stopRecordBtn.disabled = false;
+                    recordingIndicator.style.display = 'inline';
+                    updateSTTStatus('Recording live audio...', 'fas fa-dot-circle');
+                    showNotification('Recording started.', 'info', 2000);
+                    accumulatedTranscript = '';
                 };
-                // Display voice info
-                const voiceInfoSpan = document.querySelector('#voiceSelect + .mt-2 .voice-info');
-                if (voiceInfoSpan) {
-                    voiceInfoSpan.textContent = `(${currentVoiceInfo.language} - ${currentVoiceInfo.gender})`;
+
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+                    let finalTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            finalTranscript += event.results[i][0].transcript;
+                        } else {
+                            interimTranscript += event.results[i][0].transcript;
+                        }
+                    }
+                    transcriptionText.value = accumulatedTranscript + finalTranscript + interimTranscript;
+                    transcriptionResult.style.display = 'block';
+                    transcriptionStats.textContent = `${transcriptionText.value.length} characters (Live)`;
+                    // Simple language detection for live, could be improved
+                    if (event.results.length > 0 && event.results[0][0].transcript) {
+                        detectedLanguage.textContent = recognition.lang.split('-')[0].toUpperCase();
+                        detectedLanguage.style.display = 'inline-block';
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    showNotification(`Recording error: ${event.error}`, 'error');
+                    stopRecording(); // Stop on error
+                };
+
+                recognition.onend = () => {
+                    console.log('Speech recognition ended');
+                    if (isRecording) { // If it ended unexpectedly while still "recording"
+                        stopRecording();
+                        showNotification('Recording stopped unexpectedly.', 'warning');
+                    }
+                };
+            }
+
+            recordBtn.addEventListener('click', () => {
+                if (!recognition) {
+                    showNotification("Speech recognition not initialized.", "error");
+                    return;
+                }
+                if (!isRecording) {
+                    recognition.start();
+                    // Setup MediaRecorder for actual audio chunks (if needed for server-side processing later)
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then(stream => {
+                            mediaRecorder = new MediaRecorder(stream);
+                            audioChunks = [];
+                            mediaRecorder.ondataavailable = event => {
+                                audioChunks.push(event.data);
+                            };
+                            mediaRecorder.onstop = async () => {
+                                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' }); // Or appropriate type
+                                const audioFile = new File([audioBlob], 'live_recording.wav', { type: 'audio/wav' });
+                                // Optionally, send this blob to the server for Whisper transcription if needed
+                                // Currently, the live transcription uses browser's Web Speech API
+                                if (transcriptionText.value.trim()) {
+                                    accumulatedTranscript = transcriptionText.value.trim();
+                                }
+                                updateSTTStatus("Live recording finished.", 'fas fa-check-circle');
+                            };
+                            mediaRecorder.start();
+                        })
+                        .catch(err => {
+                            console.error('Error accessing microphone:', err);
+                            showNotification('Failed to access microphone for recording.', 'error');
+                            stopRecordBtn.disabled = true;
+                            recordBtn.disabled = false;
+                            recordingIndicator.style.display = 'none';
+                            updateSTTStatus("Microphone access denied.", 'fas fa-times-circle');
+                        });
                 }
             });
-            updateFavoriteButton(); // Initial update on page load
 
-            // Voice Comparison (conceptual - requires backend to generate multiple at once or client-side playback queue)
-            // This would likely involve a separate UI element to select multiple voices and trigger batch generation.
-            // Backend `generate_speech` can already handle different voices.
+            stopRecordBtn.addEventListener('click', () => {
+                stopRecording();
+            });
 
+            function stopRecording() {
+                if (isRecording) {
+                    recognition.stop();
+                    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                        mediaRecorder.stop();
+                        mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Stop microphone track
+                    }
+                    isRecording = false;
+                    recordBtn.disabled = false;
+                    stopRecordBtn.disabled = true;
+                    recordingIndicator.style.display = 'none';
+                    if (transcriptionText.value.trim()) {
+                        accumulatedTranscript = transcriptionText.value.trim(); // Finalize transcript
+                    }
+                    updateSTTStatus('Recording stopped.', 'fas fa-stop-circle');
+                    showNotification('Recording stopped.', 'info', 1500);
+                }
+            }
 
-            // --- Main Read Function ---
-            readBtn.addEventListener('click', () => generateAndPlaySpeech(textInput.value, voiceSelect.value, speedSelect.value, outputFormatSelect.value));
+            useTranscriptionBtn.addEventListener('click', () => {
+                if (transcriptionText.value.trim()) {
+                    textInput.value = transcriptionText.value.trim();
+                    charCount.textContent = `${textInput.value.length} characters`;
+                    saveTextToLocalStorage();
+                    showNotification('Transcription moved to text input!', 'success');
+                    // Optionally switch to edit tab
+                    const editTabButton = document.getElementById('edit-tab');
+                    if (editTabButton) {
+                        new bootstrap.Tab(editTabButton).show();
+                    }
+                } else {
+                    showNotification('No transcription to use.', 'warning');
+                }
+            });
 
-            async function generateAndPlaySpeech(text, voice, speed, outputFormat) {
-                if (!text.trim()) {
-                    showNotification('Please enter some text.', 'warning');
+            // --- TTS Functions ---
+
+            // Function to reset audio player state
+            function resetAudioPlayer() {
+                if (audioPlayer) {
+                    audioPlayer.pause();
+                    audioPlayer.currentTime = 0;
+                    currentAudio = null;
+                }
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                playPauseBtn.disabled = true; // Disable until new audio is loaded
+                stopBtn.disabled = true; // Disable stop button
+                downloadAudioBtn.disabled = true; // Disable download button
+                progressBar.style.width = '0%';
+                audioControls.style.display = 'none'; // Hide controls
+                isPaused = false;
+                isReading = false; // Ensure reading state is reset
+            }
+
+            // Event listener for Generate Speech Button
+            readBtn.addEventListener('click', async function () {
+                const text = textInput.value.trim();
+                if (!text) {
+                    showNotification('Please enter some text to generate speech.', 'warning');
                     return;
                 }
-                if (!voice) {
-                    showNotification('Please select a voice.', 'warning');
-                    return;
-                }
 
-                stopReading(); // Stop any ongoing playback
+                // Reset audio player state before generating new audio
+                resetAudioPlayer();
+
+                updateReadingStatus('Generating speech...', 'fas fa-circle-notch fa-spin');
                 readBtn.disabled = true;
-                stopBtn.disabled = false;
-                playPauseBtn.disabled = false;
-                downloadAudioBtn.disabled = true; // Disable download during generation
-                isReading = true;
-                audioControls.style.display = 'flex'; // Show audio controls
 
-                updateReadingStatus("Generating speech...", 'fas fa-spinner fa-spin');
+                const selectedVoiceId = voiceSelect.value;
+                const selectedSpeed = speedSelect.value;
+                const selectedFormat = outputFormatSelect.value;
 
                 try {
                     const response = await fetch('/generate_speech', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             text: text,
-                            voice: voice,
-                            speed: parseFloat(speed),
-                            output_format: outputFormat
-                        }),
+                            voice_id: selectedVoiceId,
+                            speed: parseFloat(selectedSpeed),
+                            format: selectedFormat
+                        })
                     });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to generate speech');
+                    }
 
                     const data = await response.json();
+                    if (data.success && data.audio_url) {
+                        currentAudio = data.audio_url; // Store the URL for playing and downloading
+                        currentDownloadPath = data.audio_url; // Assuming audio_url is also the download path
 
-                    if (data.success && data.audioPath) {
-                        showNotification('Speech generated successfully!', 'success');
-                        currentDownloadPath = data.audioPath;
-                        downloadAudioBtn.disabled = false;
-                        updateReadingStatus(`Playing audio (${data.characterCount} chars, Est: ${data.estimatedTime.toFixed(1)}s)...`, 'fas fa-volume-up');
-                        playAudio(data.audioPath, text); // Pass text for history
+                        audioPlayer.src = currentAudio;
+                        audioPlayer.playbackRate = parseFloat(selectedSpeed); // Apply playback rate from dropdown
+                        audioPlayer.load(); // Load the new audio
+                        audioPlayer.play(); // Auto-play the new audio
+                        isReading = true;
+
+                        // Update UI for playing state
+                        updateReadingStatus('Playing...', 'fas fa-volume-up');
+                        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        playPauseBtn.disabled = false; // Enable play/pause
+                        stopBtn.disabled = false; // Enable stop
+                        downloadAudioBtn.disabled = false; // Enable download
+                        audioControls.style.display = 'flex'; // Show controls
+                        showNotification('Speech generated and playing!', 'success');
                     } else {
-                        showNotification(`Failed to generate speech: ${data.error || 'Unknown error'}`, 'error');
-                        updateReadingStatus("Generation failed.", 'fas fa-exclamation-circle');
-                        readBtn.disabled = false;
-                        stopBtn.disabled = true;
-                        playPauseBtn.disabled = true;
-                        isReading = false;
-                        audioControls.style.display = 'none'; // Hide audio controls on failure
+                        showNotification(data.error || 'Unknown error generating speech.', 'error');
+                        updateReadingStatus('Speech generation failed.', 'fas fa-times-circle');
+                        resetAudioPlayer(); // Reset on error
                     }
                 } catch (error) {
-                    console.error('Error during speech generation:', error);
-                    showNotification('Network error during speech generation.', 'error');
-                    updateReadingStatus("Network error.", 'fas fa-exclamation-circle');
-                    readBtn.disabled = false;
-                    stopBtn.disabled = true;
-                    playPauseBtn.disabled = true;
-                    isReading = false;
-                    audioControls.style.display = 'none'; // Hide audio controls on network error
+                    console.error('Error:', error);
+                    showNotification(`Error: ${error.message}`, 'error');
+                    updateReadingStatus('Speech generation failed.', 'fas fa-times-circle');
+                    resetAudioPlayer(); // Reset on error
+                } finally {
+                    readBtn.disabled = false; // Re-enable generate button
                 }
-            }
+            });
 
-            function playAudio(path, text) {
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0;
-                }
-                currentAudio = new Audio(path);
-                currentAudio.playbackRate = parseFloat(speedSelect.value); // Set playback rate
-
-                currentAudio.oncanplaythrough = () => {
-                    currentAudio.play().catch(e => {
-                        console.error('Audio play error:', e);
-                        showNotification("Failed to play audio. Browser autoplay policy may be blocking it.", "warning", 5000);
-                        updateReadingStatus("Playback blocked.", 'fas fa-exclamation-circle');
-                        readBtn.disabled = false;
-                        stopBtn.disabled = true;
-                        playPauseBtn.disabled = true;
-                        isReading = false;
-                        currentAudio = null;
-                    });
-                    readBtn.disabled = true;
-                    stopBtn.disabled = false;
-                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                    isReading = true;
+            // Play/Pause Button
+            playPauseBtn.addEventListener('click', function () {
+                if (audioPlayer.paused && currentAudio) {
+                    audioPlayer.play();
                     isPaused = false;
-                    updateReadingStatus("Playing...", 'fas fa-volume-up');
-                    saveToHistory(text, path, voiceSelect.value); // Save to history when playing
-                };
-
-                currentAudio.onerror = (e) => {
-                    console.error('Audio loading error:', e);
-                    showNotification("Failed to load audio. Check file path or server.", "error");
-                    updateReadingStatus("Audio error.", 'fas fa-exclamation-circle');
-                    readBtn.disabled = false;
-                    stopBtn.disabled = true;
-                    playPauseBtn.disabled = true;
-                    isReading = false;
-                    currentAudio = null;
-                };
-            }
-
-            function stopReading() {
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0;
-                    currentAudio = null;
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    stopBtn.disabled = false;
+                    updateReadingStatus('Playing...', 'fas fa-volume-up');
+                } else if (currentAudio) {
+                    audioPlayer.pause();
+                    isPaused = true;
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    updateReadingStatus('Paused.', 'fas fa-pause-circle');
                 }
-                progressBar.style.width = '0%';
-                updateReadingStatus("Reading stopped.", 'fas fa-stop');
-                readBtn.disabled = false;
-                stopBtn.disabled = true;
-                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
+
+            // Stop Button - REVISED
+            stopBtn.addEventListener('click', function () {
+                resetAudioPlayer(); // Use the new reset function
+                updateReadingStatus('Ready to generate speech.', 'fas fa-circle-check'); // Reset status message
+                showNotification('Audio stopped.', 'info', 1500);
+            });
+
+            // Audio Player Event Listeners
+            audioPlayer.addEventListener('timeupdate', function () {
+                if (!isNaN(audioPlayer.duration)) {
+                    const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                    progressBar.style.width = progress + '%';
+                }
+            });
+
+            audioPlayer.addEventListener('ended', function () {
+                console.log("Audio ended.");
                 isReading = false;
                 isPaused = false;
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                stopBtn.disabled = false;
+                updateReadingStatus('Playback finished. Press play to replay or stop to clear.', 'fas fa-circle-check');
+                showNotification('Audio playback finished.', 'info', 1500);
+            });
+
+            audioPlayer.addEventListener('error', function (e) {
+                console.error('Audio playback error:', e);
+                showNotification('Error playing audio. Please try again.', 'error');
+                updateReadingStatus('Audio error.', 'fas fa-exclamation-circle');
+                resetAudioPlayer(); // Reset player state on error
+            });
+
+            // Progress bar click to seek
+            progressBarContainer.addEventListener('click', function (e) {
+                if (currentAudio && !isNaN(audioPlayer.duration)) {
+                    const clickX = e.clientX - progressBarContainer.getBoundingClientRect().left;
+                    const percent = clickX / progressBarContainer.offsetWidth;
+                    audioPlayer.currentTime = audioPlayer.duration * percent;
+                }
+            });
+
+            // Volume control
+            volumeControl.addEventListener('input', function () {
+                audioPlayer.volume = parseFloat(this.value);
+                localStorage.setItem('ttsKokoroVolume', this.value); // Save volume
+            });
+
+            // Load saved volume
+            const savedVolume = localStorage.getItem('ttsKokoroVolume');
+            if (savedVolume !== null) {
+                volumeControl.value = savedVolume;
+                audioPlayer.volume = parseFloat(savedVolume);
             }
 
-            // --- Download Audio ---
-            downloadAudioBtn.addEventListener('click', () => {
+            // Download Audio
+            downloadAudioBtn.addEventListener('click', function () {
                 if (currentDownloadPath) {
-                    const filename = currentDownloadPath.split('/').pop();
-                    const desiredFilename = `${textInput.value.substring(0, 30).replace(/[^a-zA-Z0-9 ]/g, "").trim() || 'audio'}-${Date.now()}.${outputFormatSelect.value}`;
-                    const downloadUrl = `/download_audio/${filename}?download_name=${encodeURIComponent(desiredFilename)}`;
-
-                    const a = document.createElement('a');
-                    a.href = downloadUrl;
-                    a.download = desiredFilename;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    showNotification('Audio download started!', 'info');
+                    const link = document.createElement('a');
+                    link.href = currentDownloadPath;
+                    link.download = `tts_kokoro_audio_${new Date().getTime()}.${currentDownloadPath.split('.').pop()}`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showNotification('Download started!', 'success');
                 } else {
                     showNotification('No audio to download.', 'warning');
                 }
             });
 
+            // Voice preview button logic
+            voicePreviewBtn.addEventListener('click', async function () {
+                const selectedVoiceId = voiceSelect.value;
+                const previewText = "This is a voice preview.";
+                const selectedSpeed = speedSelect.value; // Use the selected speed for preview as well
 
-            // --- Playback History ---
-            function saveToHistory(text, audioPath, voiceId) {
-                let history = JSON.parse(localStorage.getItem('ttsKokoroHistory') || '[]');
-                const newEntry = {
-                    text: text.substring(0, 100) + (text.length > 100 ? '...' : ''), // Store snippet
-                    fullText: text, // Store full text for re-load
-                    audioPath: audioPath,
-                    voice: voiceId,
-                    timestamp: Date.now()
-                };
-                history.unshift(newEntry);
-                history = history.slice(0, 10); // Keep last 10 entries
-                localStorage.setItem('ttsKokoroHistory', JSON.stringify(history));
-                loadHistory(); // Refresh history dropdown
-            }
-
-            function loadHistory() {
-                const history = JSON.parse(localStorage.getItem('ttsKokoroHistory') || '[]');
-                historyList.innerHTML = '';
-                if (history.length === 0) {
-                    historyList.innerHTML = '<li><a class="dropdown-item disabled" href="#">No history yet...</a></li>';
-                    return;
-                }
-                history.forEach((entry, index) => {
-                    const date = new Date(entry.timestamp).toLocaleString();
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" 
-                           data-history-index="${index}" 
-                           title="Voice: ${entry.voice.split(':')[1]}, Time: ${date}">
-                           ${entry.text} <span class="badge bg-secondary ms-2">${date}</span>
-                           <i class="fas fa-redo ms-2" data-action="re-read-history"></i>
-                           <i class="fas fa-trash-alt text-danger ms-2" data-action="delete-history"></i>
-                        </a>
-                    `;
-                    historyList.appendChild(li);
-                });
-            }
-
-            historyList.addEventListener('click', function (event) {
-                const target = event.target;
-                if (target.dataset.action === 'delete-history') {
-                    event.preventDefault();
-                    event.stopPropagation(); // Prevent loading history if delete button clicked
-                    const index = target.closest('[data-history-index]').dataset.historyIndex;
-                    let history = JSON.parse(localStorage.getItem('ttsKokoroHistory') || '[]');
-                    if (confirm(`Are you sure you want to delete this history entry?`)) {
-                        history.splice(index, 1);
-                        localStorage.setItem('ttsKokoroHistory', JSON.stringify(history));
-                        loadHistory();
-                        showNotification(`History entry deleted.`, 'info');
-                    }
-                } else if (target.dataset.action === 're-read-history') {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const index = target.closest('[data-history-index]').dataset.historyIndex;
-                    const history = JSON.parse(localStorage.getItem('ttsKokoroHistory') || '[]');
-                    if (history[index]) {
-                        textInput.value = history[index].fullText;
-                        voiceSelect.value = history[index].voice;
-                        charCount.textContent = `${history[index].fullText.length} characters`;
-                        saveTextToLocalStorage();
-                        updateFavoriteButton(); // Update favorite status based on re-read voice
-                        showNotification(`Loaded history entry for re-reading.`, 'info');
-                    }
-                } else if (target.dataset.historyIndex !== undefined) {
-                    event.preventDefault(); // Prevent default link behavior
-                    const index = target.dataset.historyIndex;
-                    const history = JSON.parse(localStorage.getItem('ttsKokoroHistory') || '[]');
-                    if (history[index] && history[index].audioPath) {
-                        showNotification(`Playing history: "${history[index].text}"`, 'info');
-                        playAudio(history[index].audioPath, history[index].fullText); // Play audio directly
-                    }
-                }
-            });
-
-            loadHistory(); // Load history on startup
-
-
-            // --- Keyboard Shortcuts ---
-            document.addEventListener('keydown', (e) => {
-                // Ctrl+Enter to read
-                if (e.ctrlKey && e.key === 'Enter') {
-                    e.preventDefault();
-                    readBtn.click();
-                }
-                // Space to play/pause
-                else if (e.key === ' ' && currentAudio) {
-                    e.preventDefault(); // Prevent scrolling
-                    playPauseBtn.click();
-                }
-                // Esc to stop
-                else if (e.key === 'Escape') {
-                    e.preventDefault();
-                    if (isReading) {
-                        stopReading();
-                    }
-                }
-            });
-
-            // --- Batch Processing ---
-            addToBatchBtn.addEventListener('click', () => {
-                const text = textInput.value.trim();
-                const voice = voiceSelect.value;
-                const speed = speedSelect.value;
-                const outputFormat = outputFormatSelect.value;
-
-                if (!text) {
-                    showNotification("Please enter text to add to batch.", "warning");
+                if (!previewText) {
+                    showNotification('No text for preview.', 'warning');
                     return;
                 }
 
-                batchQueue.push({ text, voice, speed, outputFormat });
-                showNotification("Text added to batch queue.", "success");
-                updateBatchQueueUI();
-                textInput.value = ''; // Clear input after adding to batch
-                charCount.textContent = `0 characters`;
-                saveTextToLocalStorage();
-            });
+                // Stop any currently playing audio (main or previous preview)
+                resetAudioPlayer(); // This will clear currentAudio and disable buttons
 
-            processBatchBtn.addEventListener('click', async () => {
-                if (batchQueue.length === 0) {
-                    showNotification("Batch queue is empty.", "warning");
-                    return;
-                }
-                showNotification("Processing batch queue...", "info", 5000);
-                processBatchBtn.disabled = true;
-                addToBatchBtn.disabled = true;
-                clearBatchBtn.disabled = true;
+                updateReadingStatus('Generating preview...', 'fas fa-circle-notch fa-spin');
+                voicePreviewBtn.disabled = true; // Disable preview button during generation
+                readBtn.disabled = true; // Also disable main generate button
 
-                for (let i = 0; i < batchQueue.length; i++) {
-                    const item = batchQueue[i];
-                    updateReadingStatus(`Processing item ${i + 1}/${batchQueue.length}: ${item.text.substring(0, 50)}...`, 'fas fa-spinner fa-spin');
-                    await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UI update
-
-                    try {
-                        await generateAndPlaySpeech(item.text, item.voice, item.speed, item.outputFormat);
-                        // Wait for audio to finish playing before next item
-                        if (currentAudio) {
-                            await new Promise(resolve => currentAudio.onended = resolve);
-                        }
-                    } catch (error) {
-                        console.error(`Error processing batch item ${i + 1}:`, error);
-                        showNotification(`Failed to process item ${i + 1} in batch.`, 'error');
-                    }
-                }
-
-                batchQueue = []; // Clear queue after processing
-                updateBatchQueueUI();
-                processBatchBtn.disabled = false;
-                addToBatchBtn.disabled = false;
-                clearBatchBtn.disabled = false;
-                showNotification("Batch processing complete!", "success", 5000);
-                updateReadingStatus("Batch processing finished.", 'fas fa-check-circle');
-            });
-
-            clearBatchBtn.addEventListener('click', () => {
-                if (confirm("Are you sure you want to clear the entire batch queue?")) {
-                    batchQueue = [];
-                    updateBatchQueueUI();
-                    showNotification("Batch queue cleared.", "info");
-                }
-            });
-
-            function updateBatchQueueUI() {
-                batchQueueList.innerHTML = '';
-                if (batchQueue.length === 0) {
-                    batchQueueList.innerHTML = '<li class="text-muted">Queue is empty.</li>';
-                } else {
-                    batchQueue.forEach((item, index) => {
-                        const li = document.createElement('li');
-                        li.textContent = `${index + 1}. ${item.text.substring(0, 70)}... (Voice: ${item.voice.split(':')[1]}, Speed: ${item.speed})`;
-                        batchQueueList.appendChild(li);
+                try {
+                    const response = await fetch('/generate_speech', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            text: previewText,
+                            voice_id: selectedVoiceId,
+                            speed: parseFloat(selectedSpeed), // Use selected speed for preview
+                            format: 'wav' // Always use WAV for preview for compatibility
+                        })
                     });
-                }
-            }
-            updateBatchQueueUI(); // Initial load of batch queue UI
 
-
-            // --- Fullscreen Mode ---
-            fullscreenBtn.addEventListener('click', toggleFullscreen);
-
-            function toggleFullscreen() {
-                const appContainer = document.querySelector('.app-container');
-                if (!document.fullscreenElement) {
-                    if (appContainer.requestFullscreen) {
-                        appContainer.requestFullscreen();
-                    } else if (appContainer.mozRequestFullScreen) { /* Firefox */
-                        appContainer.mozRequestFullScreen();
-                    } else if (appContainer.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-                        appContainer.webkitRequestFullscreen();
-                    } else if (appContainer.msRequestFullscreen) { /* IE/Edge */
-                        appContainer.msRequestFullscreen();
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to generate preview audio');
                     }
-                    document.body.classList.add('fullscreen-mode');
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.mozCancelFullScreen) { /* Firefox */
-                        document.mozCancelFullScreen();
-                    } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-                        document.webkitExitFullscreen();
-                    } else if (document.msExitFullscreen) { /* IE/Edge */
-                        document.msExitFullscreen();
+
+                    const data = await response.json();
+                    if (data.success && data.audio_url) {
+                        const previewAudio = new Audio(data.audio_url);
+                        previewAudio.playbackRate = parseFloat(selectedSpeed); // Apply speed to preview audio
+                        previewAudio.load();
+                        previewAudio.play();
+
+                        updateReadingStatus('Playing preview...', 'fas fa-volume-up');
+
+                        previewAudio.onended = () => {
+                            updateReadingStatus('Ready to generate speech.', 'fas fa-circle-check');
+                            voicePreviewBtn.disabled = false; // Re-enable preview button
+                            readBtn.disabled = false; // Re-enable main generate button
+                            showNotification('Preview finished.', 'info', 1500);
+                        };
+
+                        previewAudio.onerror = (e) => {
+                            console.error('Preview audio loading error:', e);
+                            showNotification("Failed to load preview audio.", "error");
+                            updateReadingStatus("Preview audio error.", 'fas fa-exclamation-circle');
+                            voicePreviewBtn.disabled = false;
+                            readBtn.disabled = false;
+                        };
+
+                    } else {
+                        showNotification(data.error || 'Unknown error generating preview.', 'error');
+                        updateReadingStatus('Preview generation failed.', 'fas fa-times-circle');
                     }
-                    document.body.classList.remove('fullscreen-mode');
+                } catch (error) {
+                    console.error('Preview Error:', error);
+                    showNotification(`Preview Error: ${error.message}`, 'error');
+                    updateReadingStatus('Preview generation failed.', 'fas fa-times-circle');
+                } finally {
+                    voicePreviewBtn.disabled = false; // Ensure button is re-enabled on complete or error
+                    readBtn.disabled = false; // Ensure main generate button is re-enabled
                 }
-            }
+            });
 
-            // Helper to get CSS variable values
-            function varCss(name) {
-                return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-            }
+            // Workflow Tab Changes (to reset audio when changing tabs)
+            const workflowTabs = document.getElementById('workflowTabs');
+            workflowTabs.addEventListener('shown.bs.tab', function (event) {
+                // If moving away from the TTS tab, stop any playing audio
+                if (event.relatedTarget && event.relatedTarget.id === 'tts-tab') {
+                    resetAudioPlayer();
+                    updateReadingStatus('Ready to generate speech.', 'fas fa-circle-check');
+                }
+            });
 
-            // Initial status message
+            // Template and History/Snippets (Placeholder - assuming existing functionality)
+            const templatesList = document.getElementById('templatesList');
+            templatesList.addEventListener('click', function (e) {
+                if (e.target.tagName === 'A' && e.target.dataset.template) {
+                    e.preventDefault();
+                    const templateName = e.target.dataset.template;
+                    let templateText = "";
+                    switch (templateName) {
+                        case "Welcome message":
+                            templateText = "Hello and welcome to TTS KOKORO! This is a simple text-to-speech application. Feel free to generate speech from your text.";
+                            break;
+                        case "Announcement":
+                            templateText = "Attention all users: We are excited to announce new updates coming soon. Stay tuned for more features and improvements!";
+                            break;
+                        case "Quick test":
+                            templateText = "The quick brown fox jumps over the lazy dog. This is a test of the text-to-speech system.";
+                            break;
+                        default:
+                            templateText = "Selected template has no defined text.";
+                    }
+                    textInput.value = templateText;
+                    textInput.dispatchEvent(new Event('input')); // Trigger input event to update char count and save
+                    showNotification(`Template "${templateName}" loaded.`, 'info');
+                    // Switch to edit tab
+                    const editTabButton = document.getElementById('edit-tab');
+                    if (editTabButton) {
+                        new bootstrap.Tab(editTabButton).show();
+                    }
+                }
+            });
+
+            // Initialize - important for initial state
             updateReadingStatus("Ready to generate speech.", 'fas fa-circle-check');
-            resetAudioControls(); // Ensure controls are initially hidden/disabled
-
-            // Update voice info when page loads
-            const initialSelectedOption = voiceSelect.options[voiceSelect.selectedIndex];
-            currentVoiceInfo = {
-                language: initialSelectedOption.dataset.language,
-                gender: initialSelectedOption.dataset.gender
-            };
-            const voiceInfoSpan = document.querySelector('#voiceSelect + .mt-2 .voice-info');
-            if (voiceInfoSpan) {
-                voiceInfoSpan.textContent = `(${currentVoiceInfo.language} - ${currentVoiceInfo.gender})`;
-            }
+            resetAudioPlayer(); // Call reset on initialization
+            checkSTTAvailability();
+            initializeSpeechRecognition();
         });
     </script>
 </body>
