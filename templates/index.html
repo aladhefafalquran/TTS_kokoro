@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS KOKORO - Piper Text Reader</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6baf;
+            --primary-hover: #3a5999;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+            --dark-text: #333;
+            --light-text: #f8f9fa;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8; /* Added for notifications */
+            --gradient-start: #6a11cb;
+            --gradient-end: #2575fc;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        body.dark-mode {
+            --primary-color: #5a7bc7;
+            --light-bg: #1a1a1a;
+            --dark-text: #e0e0e0;
+            --border-color: #333;
+            --secondary-color: #a0a0a0;
+            --success-color: #4CAF50;
+            --danger-color: #F44336;
+            --warning-color: #FFC107;
+            --info-color: #2196F3;
+            background-color: #121212;
+        }
+
+        .app-container {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body.dark-mode .app-container {
+            background: #1e1e1e;
+            color: var(--dark-text);
+            border-color: #444;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .text-input,
+        .form-select,
+        .form-control {
+            background: var(--light-bg);
+            color: var(--dark-text);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        body.dark-mode .text-input,
+        body.dark-mode .form-select,
+        body.dark-mode .form-control {
+            background: #2a2a2a;
+            color: var(--dark-text);
+            border-color: #444;
+        }
+
+        .text-input:focus,
+        .form-select:focus,
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(74, 107, 175, 0.25);
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+
+        body.dark-mode .text-input:focus,
+        body.dark-mode .form-select:focus,
+        body.dark-mode .form-control:focus {
+            background-color: #2a2a2a;
+            color: var(--dark-text);
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 10px 20px;
+            transition: all 0.2s ease;
+            transform: translateY(0);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: var(--light-text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .notification {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .notification.success {
+            background-color: var(--success-color);
+        }
+
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+
+        #readingStatus {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            min-height: 20px;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: var(--border-color);
+            border-radius: 5px;
+            margin-top: 10px;
+            height: 10px;
+            overflow: hidden;
+            cursor: pointer; /* Make progress bar clickable for scrubbing */
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            transition: width 0.1s linear;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--light-bg);
+            flex-wrap: wrap; /* Allow wrapping for smaller screens */
+        }
+
+        body.dark-mode .audio-controls {
+            background-color: #2a2a2a;
+            border-color: #444;
+        }
+
+        .volume-control-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .volume-control-container input[type="range"] {
+            width: 80px;
+            margin: 0;
+        }
+
+        .voice-info {
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+            margin-left: 10px;
+        }
+
+        .favorite-voice-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0 5px;
+            transition: color 0.2s ease;
+        }
+
+        .favorite-voice-btn.favorited {
+            color: var(--warning-color);
+        }
+
+        .voice-option-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .voice-option-wrapper .voice-preview-btn {
+            margin-left: auto; /* Push to the right */
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 5px;
+            background-color: var(--info-color);
+            color: var(--light-text);
+            border: none;
+            cursor: pointer;
+        }
+
+        .voice-option-wrapper .voice-preview-btn:hover {
+            opacity: 0.8;
+        }
+
+        .template-dropdown,
+        .history-dropdown,
+        .snippets-dropdown {
+            margin-bottom: 15px;
+        }
+
+        .dropdown-menu {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 8px;
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+        }
+        body.dark-mode .dropdown-menu {
+            background-color: #2a2a2a;
+            border-color: #444;
+        }
+
+        .dropdown-item {
+            color: var(--dark-text);
+            padding: 8px 15px;
+            transition: background-color 0.2s ease;
+        }
+        body.dark-mode .dropdown-item {
+            color: var(--dark-text);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        body.dark-mode .dropdown-item:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .form-check-label {
+            color: var(--dark-text);
+        }
+
+        #dark-mode-toggle-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #dark-mode-toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        #dark-mode-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 28px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Batch processing UI */
+        #batch-queue-container {
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            background-color: var(--light-bg);
+        }
+        body.dark-mode #batch-queue-container {
+            background-color: #2a2a2a;
+            border-color: #444;
+        }
+
+        #batch-queue-list {
+            list-style: none;
+            padding: 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        #batch-queue-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #batch-queue-list li:last-child {
+            border-bottom: none;
+        }
+
+        .loading-dots span {
+            animation: wave 1.4s infinite;
+            animation-delay: calc(0.1s * var(--i));
+            display: inline-block;
+            margin: 0 1px;
+            font-weight: bold;
+        }
+
+        @keyframes wave {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .drag-drop-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 15px;
+            color: var(--secondary-color);
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .drag-drop-area:hover {
+            background-color: rgba(74, 107, 175, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        /* Fullscreen mode specific styles */
+        body.fullscreen-mode {
+            background-color: var(--light-bg);
+            display: block;
+            min-height: 100vh;
+            padding: 0;
+        }
+        body.fullscreen-mode .app-container {
+            width: 100%;
+            max-width: 100%;
+            height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        body.fullscreen-mode .text-input {
+            flex-grow: 1; /* Make text area fill available space */
+            min-height: 200px; /* Minimum height for text area */
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="dark-mode-toggle-container">
+        <label id="dark-mode-label" for="dark-mode-checkbox">Light Mode</label>
+        <label class="switch" id="dark-mode-toggle">
+            <input type="checkbox" id="dark-mode-checkbox">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="app-container">
+        <h1 class="mb-4">
+            <img src="/static/logo.png" alt="KOKORO Logo" height="60" class="me-2"> TTS KOKORO
+        </h1>
+
+        <div class="notification-container" id="notificationContainer"></div>
+
+        <div class="mb-3">
+            <label for="textInput" class="form-label">Text to Speak <span id="charCount" class="text-muted small ms-2">0 characters</span></label>
+            <textarea class="form-control text-input" id="textInput" rows="8" placeholder="Enter text here..."></textarea>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <div>
+                    <button class="btn btn-secondary btn-sm" id="copyTextBtn" aria-label="Copy text to clipboard">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <button class="btn btn-secondary btn-sm ms-2" id="clearTextBtn" aria-label="Clear text area">
+                        <i class="fas fa-eraser"></i> Clear
+                    </button>
+                </div>
+                <div>
+                    <input type="file" id="fileImport" class="d-none" accept=".txt, .pdf, .docx">
+                    <button class="btn btn-secondary btn-sm" id="importFileBtn" aria-label="Import text from file">
+                        <i class="fas fa-file-upload"></i> Import File
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="drag-drop-area d-none" id="dragDropArea">
+            <p><i class="fas fa-cloud-upload-alt fa-2x"></i></p>
+            <p>Drag & Drop .txt, .pdf, or .docx files here</p>
+            <p class="small text-muted">(or click to select file)</p>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label for="voiceSelect" class="form-label">Select Voice</label>
+                <select class="form-select" id="voiceSelect" aria-label="Select voice for speech synthesis">
+                    <optgroup label="Piper Voices">
+                        {% for voice in piper_voices %}
+                        <option value="piper:{{ voice.id }}" data-language="{{ voice.language }}" data-gender="{{ voice.gender }}">
+                            <span class="voice-name">{{ voice.name }}</span>
+                            <span class="voice-info">({{ voice.language }} - {{ voice.gender }})</span>
+                        </option>
+                        {% endfor %}
+                    </optgroup>
+                </select>
+                <div class="mt-2 text-end">
+                    <button class="btn btn-sm btn-info voice-preview-btn" id="voicePreviewBtn" aria-label="Preview selected voice">
+                        <i class="fas fa-play"></i> Preview Voice
+                    </button>
+                    <button class="btn btn-sm favorite-voice-btn" id="favoriteVoiceBtn" aria-label="Favorite selected voice">
+                        <i class="fas fa-star"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="speedSelect" class="form-label">Speed</label>
+                <select class="form-select" id="speedSelect" aria-label="Select playback speed">
+                    <option value="0.75">0.75x</option>
+                    <option value="1.0" selected>1.0x (Normal)</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="1.75">1.75x</option>
+                    <option value="2.0">2.0x</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="outputFormatSelect" class="form-label">Output Format</label>
+                <select class="form-select" id="outputFormatSelect" aria-label="Select audio output format">
+                    <option value="wav" selected>WAV</option>
+                    <option value="mp3">MP3</option>
+                    <option value="ogg">OGG</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <div class="dropdown template-dropdown">
+                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="templatesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-file-alt"></i> Text Templates
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="templatesDropdown" id="templatesList">
+                        <li><a class="dropdown-item" href="#" data-template="Welcome message">Welcome message</a></li>
+                        <li><a class="dropdown-item" href="#" data-template="Announcement">Announcement</a></li>
+                        <li><a class="dropdown-item" href="#" data-template="Error message">Error message</a></li>
+                        <li><a class="dropdown-item" href="#" data-template="Quick test">Quick test</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dropdown history-dropdown">
+                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="historyDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-history"></i> Playback History
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="historyDropdown" id="historyList">
+                        <li><a class="dropdown-item disabled" href="#">No history yet...</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dropdown snippets-dropdown">
+                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="snippetsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bookmark"></i> Saved Snippets
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="snippetsDropdown" id="snippetsList">
+                        <li><a class="dropdown-item disabled" href="#">No snippets saved...</a></li>
+                    </ul>
+                </div>
+                <div class="mt-2 text-end">
+                    <button class="btn btn-sm btn-secondary" id="saveSnippetBtn" aria-label="Save current text as snippet">
+                        <i class="fas fa-save"></i> Save Snippet
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="d-grid gap-2 mb-3">
+            <button class="btn btn-primary btn-lg" id="readBtn" aria-label="Read text aloud">
+                <i class="fas fa-volume-up"></i> Read Text
+            </button>
+        </div>
+
+        <div id="readingStatus" class="text-center text-muted">
+            <i class="fas fa-circle-notch fa-spin"></i> Initializing...
+        </div>
+
+        <div class="audio-controls" id="audioControls" style="display:none;">
+            <audio id="audioPlayer" controls style="display:none;"></audio>
+            <button class="btn btn-secondary" id="playPauseBtn" aria-label="Play/Pause audio">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="btn btn-danger" id="stopBtn" disabled aria-label="Stop audio playback">
+                <i class="fas fa-stop"></i>
+            </button>
+            <div class="progress-container flex-grow-1" id="progressBarContainer" aria-label="Audio progress bar">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="volume-control-container">
+                <i class="fas fa-volume-up"></i>
+                <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1" aria-label="Volume control">
+            </div>
+            <button class="btn btn-success" id="downloadAudioBtn" disabled aria-label="Download generated audio">
+                <i class="fas fa-download"></i> Download
+            </button>
+        </div>
+
+        <div id="batch-queue-container" class="mt-4">
+            <h5><i class="fas fa-layer-group"></i> Batch Processing Queue</h5>
+            <div class="d-flex gap-2 mb-3">
+                <button class="btn btn-sm btn-secondary" id="addToBatchBtn" aria-label="Add current text to batch queue">
+                    <i class="fas fa-plus-circle"></i> Add to Batch
+                </button>
+                <button class="btn btn-sm btn-primary" id="processBatchBtn" aria-label="Process batch queue">
+                    <i class="fas fa-play-circle"></i> Process Batch
+                </button>
+                <button class="btn btn-sm btn-danger" id="clearBatchBtn" aria-label="Clear batch queue">
+                    <i class="fas fa-trash-alt"></i> Clear Batch
+                </button>
+            </div>
+            <ul id="batch-queue-list">
+                <li class="text-muted">Queue is empty.</li>
+            </ul>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button class="btn btn-secondary btn-sm" id="fullscreenBtn" aria-label="Toggle fullscreen mode">
+                <i class="fas fa-expand"></i> Fullscreen
+            </button>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const textInput = document.getElementById('textInput');
+            const readBtn = document.getElementById('readBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const voiceSelect = document.getElementById('voiceSelect');
+            const speedSelect = document.getElementById('speedSelect');
+            const outputFormatSelect = document.getElementById('outputFormatSelect');
+            const readingStatus = document.getElementById('readingStatus');
+            const downloadAudioBtn = document.getElementById('downloadAudioBtn');
+            const notificationContainer = document.getElementById('notificationContainer');
+            const charCount = document.getElementById('charCount');
+            const copyTextBtn = document.getElementById('copyTextBtn');
+            const clearTextBtn = document.getElementById('clearTextBtn');
+            const darkmodeToggleCheckbox = document.getElementById('dark-mode-checkbox');
+            const darkmodeLabel = document.getElementById('dark-mode-label');
+            const progressBar = document.getElementById('progressBar');
+            const progressBarContainer = document.getElementById('progressBarContainer');
+            const volumeControl = document.getElementById('volumeControl');
+            const audioControls = document.getElementById('audioControls');
+            const voicePreviewBtn = document.getElementById('voicePreviewBtn');
+            const favoriteVoiceBtn = document.getElementById('favoriteVoiceBtn');
+            const templatesList = document.getElementById('templatesList');
+            const historyList = document.getElementById('historyList');
+            const snippetsList = document.getElementById('snippetsList');
+            const saveSnippetBtn = document.getElementById('saveSnippetBtn');
+            const importFileBtn = document.getElementById('importFileBtn');
+            const fileImport = document.getElementById('fileImport');
+            const dragDropArea = document.getElementById('dragDropArea');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+            // Batch Processing elements
+            const addToBatchBtn = document.getElementById('addToBatchBtn');
+            const processBatchBtn = document.getElementById('processBatchBtn');
+            const clearBatchBtn = document.getElementById('clearBatchBtn');
+            const batchQueueList = document.getElementById('batch-queue-list');
+            let batchQueue = []; // Array to hold texts for batch processing
+
+            let currentAudio = null;
+            let isReading = false;
+            let isPaused = false;
+            let currentDownloadPath = null;
+            let currentVoiceInfo = {}; // Stores language, gender for selected voice
+
+            // --- Utility Functions ---
+
+            function showNotification(message, type = 'info', duration = 3000) {
+                const notification = document.createElement('div');
+                notification.classList.add('notification', type);
+                notification.textContent = message;
+                notificationContainer.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 10); // Small delay to trigger CSS transition
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    notification.addEventListener('transitionend', () => notification.remove());
+                }, duration);
+            }
+
+            function updateReadingStatus(message, icon = 'fas fa-circle-notch fa-spin') {
+                readingStatus.innerHTML = `<i class="${icon}"></i> ${message}`;
+            }
+
+            // --- Dark Mode ---
+            function applyDarkMode(isDark) {
+                if (isDark) {
+                    document.body.classList.add('dark-mode');
+                    darkmodeLabel.textContent = 'Dark Mode';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    darkmodeLabel.textContent = 'Light Mode';
+                }
+                localStorage.setItem('darkMode', isDark);
+            }
+
+            // Load dark mode preference
+            const savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'true') {
+                darkmodeToggleCheckbox.checked = true;
+                applyDarkMode(true);
+            } else {
+                darkmodeToggleCheckbox.checked = false;
+                applyDarkMode(false);
+            }
+
+            darkmodeToggleCheckbox.addEventListener('change', (event) => {
+                applyDarkMode(event.target.checked);
+            });
+
+            // --- Text Management ---
+
+            // Character Counter
+            textInput.addEventListener('input', function () {
+                const count = this.value.length;
+                charCount.textContent = `${count} characters`;
+                saveTextToLocalStorage(); // Auto-save
+            });
+
+            // Auto-save text to localStorage
+            function saveTextToLocalStorage() {
+                localStorage.setItem('ttsKokoroTextInput', textInput.value);
+            }
+
+            // Load text from localStorage
+            function loadTextFromLocalStorage() {
+                const savedText = localStorage.getItem('ttsKokoroTextInput');
+                if (savedText) {
+                    textInput.value = savedText;
+                    charCount.textContent = `${savedText.length} characters`;
+                }
+            }
+
+            loadTextFromLocalStorage(); // Load on startup
+
+            // Copy to Clipboard
+            copyTextBtn.addEventListener('click', function () {
+                navigator.clipboard.writeText(textInput.value).then(() => {
+                    showNotification('Text copied to clipboard!', 'success');
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    showNotification('Failed to copy text.', 'error');
+                });
+            });
+
+            // Clear Text Button
+            clearTextBtn.addEventListener('click', function () {
+                if (confirm('Are you sure you want to clear all text? This cannot be undone.')) {
+                    textInput.value = '';
+                    textInput.focus();
+                    charCount.textContent = `0 characters`;
+                    saveTextToLocalStorage(); // Clear saved text
+                    showNotification('Text area cleared!', 'info');
+                }
+            });
+
+            // Text Templates
+            templatesList.addEventListener('click', function (event) {
+                const templateText = event.target.dataset.template;
+                if (templateText) {
+                    let content = '';
+                    switch (templateText) {
+                        case "Welcome message":
+                            content = "Hello! Welcome to TTS KOKORO, your ultimate text-to-speech companion. Enjoy generating high-quality audio!";
+                            break;
+                        case "Announcement":
+                            content = "Attention all users: We have just released new features including enhanced audio controls and dark mode. Update your application for the best experience.";
+                            break;
+                        case "Error message":
+                            content = "Error: Unable to process your request. Please check your internet connection or try again later. If the problem persists, contact support.";
+                            break;
+                        case "Quick test":
+                            content = "This is a quick test of the selected voice. The quick brown fox jumps over the lazy dog.";
+                            break;
+                    }
+                    textInput.value = content;
+                    charCount.textContent = `${content.length} characters`;
+                    saveTextToLocalStorage();
+                    showNotification(`Loaded template: "${templateText}"`, 'info');
+                }
+            });
+
+            // Save/Load Snippets
+            function saveSnippet(text) {
+                let snippets = JSON.parse(localStorage.getItem('textSnippets') || '[]');
+                const snippetName = prompt("Enter a name for this snippet:");
+                if (snippetName && text.trim() !== "") {
+                    snippets.unshift({ name: snippetName, text: text, timestamp: Date.now() });
+                    localStorage.setItem('textSnippets', JSON.stringify(snippets));
+                    loadSnippets(); // Reload snippets list
+                    showNotification(`Snippet "${snippetName}" saved!`, 'success');
+                } else if (text.trim() === "") {
+                    showNotification("Cannot save empty text as a snippet.", "warning");
+                }
+            }
+
+            function loadSnippets() {
+                const snippets = JSON.parse(localStorage.getItem('textSnippets') || '[]');
+                snippetsList.innerHTML = '';
+                if (snippets.length === 0) {
+                    snippetsList.innerHTML = '<li><a class="dropdown-item disabled" href="#">No snippets saved...</a></li>';
+                    return;
+                }
+                snippets.forEach((snippet, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" data-snippet-index="${index}">
+                            ${snippet.name} <i class="fas fa-trash-alt text-danger ms-2" data-action="delete-snippet"></i>
+                        </a>
+                    `;
+                    snippetsList.appendChild(li);
+                });
+            }
+
+            snippetsList.addEventListener('click', function (event) {
+                const target = event.target;
+                if (target.dataset.action === 'delete-snippet') {
+                    event.preventDefault();
+                    event.stopPropagation(); // Prevent loading the snippet if delete button clicked
+                    const index = target.closest('[data-snippet-index]').dataset.snippetIndex;
+                    let snippets = JSON.parse(localStorage.getItem('textSnippets') || '[]');
+                    const snippetName = snippets[index].name;
+                    if (confirm(`Are you sure you want to delete snippet "${snippetName}"?`)) {
+                        snippets.splice(index, 1);
+                        localStorage.setItem('textSnippets', JSON.stringify(snippets));
+                        loadSnippets();
+                        showNotification(`Snippet "${snippetName}" deleted.`, 'info');
+                    }
+                } else if (target.dataset.snippetIndex !== undefined) {
+                    event.preventDefault();
+                    const index = target.dataset.snippetIndex;
+                    const snippets = JSON.parse(localStorage.getItem('textSnippets') || '[]');
+                    if (snippets[index]) {
+                        textInput.value = snippets[index].text;
+                        charCount.textContent = `${snippets[index].text.length} characters`;
+                        saveTextToLocalStorage();
+                        showNotification(`Loaded snippet: "${snippets[index].name}"`, 'info');
+                    }
+                }
+            });
+
+            saveSnippetBtn.addEventListener('click', () => saveSnippet(textInput.value));
+            loadSnippets(); // Load snippets on startup
+
+            // File Import
+            importFileBtn.addEventListener('click', () => {
+                fileImport.click(); // Trigger the hidden file input
+            });
+
+            fileImport.addEventListener('change', handleFileSelect);
+            dragDropArea.addEventListener('click', () => fileImport.click()); // Click to select file
+
+            dragDropArea.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                dragDropArea.style.borderColor = varCss('--primary-color');
+                dragDropArea.style.backgroundColor = 'rgba(74, 107, 175, 0.1)';
+            });
+
+            dragDropArea.addEventListener('dragleave', () => {
+                dragDropArea.style.borderColor = varCss('--border-color');
+                dragDropArea.style.backgroundColor = 'transparent';
+            });
+
+            dragDropArea.addEventListener('drop', (event) => {
+                event.preventDefault();
+                dragDropArea.style.borderColor = varCss('--border-color');
+                dragDropArea.style.backgroundColor = 'transparent';
+                handleFileSelect({ target: { files: event.dataTransfer.files } });
+            });
+
+            function handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const content = e.target.result;
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                    if (fileExtension === 'txt') {
+                        textInput.value = content;
+                        charCount.textContent = `${content.length} characters`;
+                        saveTextToLocalStorage();
+                        showNotification(`Loaded .txt file: ${file.name}`, 'success');
+                    } else if (fileExtension === 'pdf' || fileExtension === 'docx') {
+                        // For .pdf and .docx, this is client-side JS.
+                        // Actual text extraction for these formats usually requires a backend library.
+                        // Inform the user that full support requires backend.
+                        showNotification(`Cannot directly read .${fileExtension} files in browser. Please use a .txt file or note that this feature requires backend support.`, 'warning', 7000);
+                        // Optionally, you could send the file to the backend for processing here.
+                    } else {
+                        showNotification(`Unsupported file type: .${fileExtension}`, 'warning');
+                    }
+                };
+
+                reader.onerror = function () {
+                    showNotification('Failed to read file!', 'error');
+                };
+
+                if (file.type === 'text/plain') {
+                    reader.readAsText(file);
+                } else if (file.type === 'application/pdf' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                    // For backend processing, you'd send the file via Fetch API
+                    showNotification(`Attempting to load ${file.name}. Note: Advanced file types (.pdf, .docx) currently require server-side processing which is not fully implemented in this demo.`, 'info', 5000);
+                } else {
+                    showNotification('Please select a .txt, .pdf, or .docx file.', 'warning');
+                }
+            }
+
+
+            // --- Audio Playback Controls ---
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            stopBtn.addEventListener('click', stopReading);
+            audioPlayer.addEventListener('timeupdate', updateProgressBar);
+            audioPlayer.addEventListener('ended', handleAudioEnded);
+            audioPlayer.addEventListener('pause', () => {
+                isPaused = true;
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
+            audioPlayer.addEventListener('play', () => {
+                isPaused = false;
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            });
+
+            volumeControl.addEventListener('input', (event) => {
+                audioPlayer.volume = event.target.value;
+                localStorage.setItem('audioVolume', event.target.value); // Save volume preference
+            });
+
+            // Load saved volume preference
+            const savedVolume = localStorage.getItem('audioVolume');
+            if (savedVolume !== null) {
+                audioPlayer.volume = parseFloat(savedVolume);
+                volumeControl.value = parseFloat(savedVolume);
+            }
+
+            function togglePlayPause() {
+                if (currentAudio) {
+                    if (isPaused) {
+                        currentAudio.play();
+                    } else {
+                        currentAudio.pause();
+                    }
+                } else if (currentDownloadPath) {
+                    // If audio was stopped but path exists, try to play from start
+                    playAudio(currentDownloadPath);
+                } else {
+                    showNotification("No audio to play.", "warning");
+                }
+            }
+
+            function updateProgressBar() {
+                if (currentAudio && !isNaN(currentAudio.duration)) {
+                    const percentage = (currentAudio.currentTime / currentAudio.duration) * 100;
+                    progressBar.style.width = percentage + '%';
+                }
+            }
+
+            // Audio Scrubbing (Seek bar)
+            progressBarContainer.addEventListener('click', function (e) {
+                if (currentAudio && !isNaN(currentAudio.duration)) {
+                    const rect = progressBarContainer.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const width = rect.width;
+                    const percentage = clickX / width;
+                    currentAudio.currentTime = currentAudio.duration * percentage;
+                }
+            });
+
+            function handleAudioEnded() {
+                stopReading(); // Call stop function to reset UI
+                showNotification("Audio playback finished.", "info");
+            }
+
+            function resetAudioControls() {
+                audioControls.style.display = 'none';
+                progressBar.style.width = '0%';
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                stopBtn.disabled = true;
+                downloadAudioBtn.disabled = true;
+                currentAudio = null;
+                isReading = false;
+                isPaused = false;
+                currentDownloadPath = null;
+            }
+
+
+            // --- Voice Enhancement ---
+
+            // Voice Preview
+            voicePreviewBtn.addEventListener('click', async () => {
+                const selectedVoice = voiceSelect.value;
+                if (!selectedVoice) {
+                    showNotification('Please select a voice first.', 'warning');
+                    return;
+                }
+                const sampleText = "Hello! This is how I sound.";
+                updateReadingStatus("Generating voice preview...", 'fas fa-spinner fa-spin');
+                
+                try {
+                    const response = await fetch('/preview_voice', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ voice_id: selectedVoice, sample_text: sampleText })
+                    });
+                    const data = await response.json();
+
+                    if (data.success && data.audioPath) {
+                        showNotification('Voice preview ready!', 'success');
+                        playAudio(data.audioPath);
+                    } else {
+                        showNotification(`Failed to preview voice: ${data.error || 'Unknown error'}`, 'error');
+                        updateReadingStatus("Failed to generate preview.", 'fas fa-exclamation-circle');
+                        resetAudioControls();
+                    }
+                } catch (error) {
+                    console.error('Error during voice preview:', error);
+                    showNotification('Network error during voice preview.', 'error');
+                    updateReadingStatus("Failed to generate preview.", 'fas fa-exclamation-circle');
+                    resetAudioControls();
+                }
+            });
+
+            // Favorite Voices
+            function getFavoriteVoices() {
+                return JSON.parse(localStorage.getItem('favoriteVoices') || '[]');
+            }
+
+            function saveFavoriteVoices(favorites) {
+                localStorage.setItem('favoriteVoices', JSON.stringify(favorites));
+            }
+
+            function updateFavoriteButton() {
+                const selectedVoiceValue = voiceSelect.value;
+                const favorites = getFavoriteVoices();
+                if (favorites.includes(selectedVoiceValue)) {
+                    favoriteVoiceBtn.classList.add('favorited');
+                } else {
+                    favoriteVoiceBtn.classList.remove('favorited');
+                }
+            }
+
+            favoriteVoiceBtn.addEventListener('click', () => {
+                const selectedVoiceValue = voiceSelect.value;
+                if (!selectedVoiceValue) {
+                    showNotification("Please select a voice to favorite.", "warning");
+                    return;
+                }
+                let favorites = getFavoriteVoices();
+                if (favorites.includes(selectedVoiceValue)) {
+                    favorites = favorites.filter(v => v !== selectedVoiceValue);
+                    showNotification("Voice removed from favorites.", "info");
+                } else {
+                    favorites.push(selectedVoiceValue);
+                    showNotification("Voice added to favorites!", "success");
+                }
+                saveFavoriteVoices(favorites);
+                updateFavoriteButton(); // Update star icon immediately
+            });
+
+            // Update favorite button state when voice selection changes
+            voiceSelect.addEventListener('change', () => {
+                updateFavoriteButton();
+                // Update currentVoiceInfo
+                const selectedOption = voiceSelect.options[voiceSelect.selectedIndex];
+                currentVoiceInfo = {
+                    language: selectedOption.dataset.language,
+                    gender: selectedOption.dataset.gender
+                };
+                // Display voice info
+                const voiceInfoSpan = document.querySelector('#voiceSelect + .mt-2 .voice-info');
+                if (voiceInfoSpan) {
+                    voiceInfoSpan.textContent = `(${currentVoiceInfo.language} - ${currentVoiceInfo.gender})`;
+                }
+            });
+            updateFavoriteButton(); // Initial update on page load
+
+            // Voice Comparison (conceptual - requires backend to generate multiple at once or client-side playback queue)
+            // This would likely involve a separate UI element to select multiple voices and trigger batch generation.
+            // Backend `generate_speech` can already handle different voices.
+
+
+            // --- Main Read Function ---
+            readBtn.addEventListener('click', () => generateAndPlaySpeech(textInput.value, voiceSelect.value, speedSelect.value, outputFormatSelect.value));
+
+            async function generateAndPlaySpeech(text, voice, speed, outputFormat) {
+                if (!text.trim()) {
+                    showNotification('Please enter some text.', 'warning');
+                    return;
+                }
+                if (!voice) {
+                    showNotification('Please select a voice.', 'warning');
+                    return;
+                }
+
+                stopReading(); // Stop any ongoing playback
+                readBtn.disabled = true;
+                stopBtn.disabled = false;
+                playPauseBtn.disabled = false;
+                downloadAudioBtn.disabled = true; // Disable download during generation
+                isReading = true;
+                audioControls.style.display = 'flex'; // Show audio controls
+
+                updateReadingStatus("Generating speech...", 'fas fa-spinner fa-spin');
+
+                try {
+                    const response = await fetch('/generate_speech', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            text: text,
+                            voice: voice,
+                            speed: parseFloat(speed),
+                            output_format: outputFormat
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success && data.audioPath) {
+                        showNotification('Speech generated successfully!', 'success');
+                        currentDownloadPath = data.audioPath;
+                        downloadAudioBtn.disabled = false;
+                        updateReadingStatus(`Playing audio (${data.characterCount} chars, Est: ${data.estimatedTime.toFixed(1)}s)...`, 'fas fa-volume-up');
+                        playAudio(data.audioPath, text); // Pass text for history
+                    } else {
+                        showNotification(`Failed to generate speech: ${data.error || 'Unknown error'}`, 'error');
+                        updateReadingStatus("Generation failed.", 'fas fa-exclamation-circle');
+                        readBtn.disabled = false;
+                        stopBtn.disabled = true;
+                        playPauseBtn.disabled = true;
+                        isReading = false;
+                        audioControls.style.display = 'none'; // Hide audio controls on failure
+                    }
+                } catch (error) {
+                    console.error('Error during speech generation:', error);
+                    showNotification('Network error during speech generation.', 'error');
+                    updateReadingStatus("Network error.", 'fas fa-exclamation-circle');
+                    readBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    playPauseBtn.disabled = true;
+                    isReading = false;
+                    audioControls.style.display = 'none'; // Hide audio controls on network error
+                }
+            }
+
+            function playAudio(path, text) {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+                currentAudio = new Audio(path);
+                currentAudio.playbackRate = parseFloat(speedSelect.value); // Set playback rate
+
+                currentAudio.oncanplaythrough = () => {
+                    currentAudio.play().catch(e => {
+                        console.error('Audio play error:', e);
+                        showNotification("Failed to play audio. Browser autoplay policy may be blocking it.", "warning", 5000);
+                        updateReadingStatus("Playback blocked.", 'fas fa-exclamation-circle');
+                        readBtn.disabled = false;
+                        stopBtn.disabled = true;
+                        playPauseBtn.disabled = true;
+                        isReading = false;
+                        currentAudio = null;
+                    });
+                    readBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    isReading = true;
+                    isPaused = false;
+                    updateReadingStatus("Playing...", 'fas fa-volume-up');
+                    saveToHistory(text, path, voiceSelect.value); // Save to history when playing
+                };
+
+                currentAudio.onerror = (e) => {
+                    console.error('Audio loading error:', e);
+                    showNotification("Failed to load audio. Check file path or server.", "error");
+                    updateReadingStatus("Audio error.", 'fas fa-exclamation-circle');
+                    readBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    playPauseBtn.disabled = true;
+                    isReading = false;
+                    currentAudio = null;
+                };
+            }
+
+            function stopReading() {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    currentAudio = null;
+                }
+                progressBar.style.width = '0%';
+                updateReadingStatus("Reading stopped.", 'fas fa-stop');
+                readBtn.disabled = false;
+                stopBtn.disabled = true;
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                isReading = false;
+                isPaused = false;
+            }
+
+            // --- Download Audio ---
+            downloadAudioBtn.addEventListener('click', () => {
+                if (currentDownloadPath) {
+                    const filename = currentDownloadPath.split('/').pop();
+                    const desiredFilename = `${textInput.value.substring(0, 30).replace(/[^a-zA-Z0-9 ]/g, "").trim() || 'audio'}-${Date.now()}.${outputFormatSelect.value}`;
+                    const downloadUrl = `/download_audio/${filename}?download_name=${encodeURIComponent(desiredFilename)}`;
+
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = desiredFilename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    showNotification('Audio download started!', 'info');
+                } else {
+                    showNotification('No audio to download.', 'warning');
+                }
+            });
+
+
+            // --- Playback History ---
+            function saveToHistory(text, audioPath, voiceId) {
+                let history = JSON.parse(localStorage.getItem('ttsKokoroHistory') || '[]');
+                const newEntry = {
+                    text: text.substring(0, 100) + (text.length > 100 ? '...' : ''), // Store snippet
+                    fullText: text, // Store full text for re-load
+                    audioPath: audioPath,
+                    voice: voiceId,
+                    timestamp: Date.now()
+                };
+                history.unshift(newEntry);
+                history = history.slice(0, 10); // Keep last 10 entries
+                localStorage.setItem('ttsKokoroHistory', JSON.stringify(history));
+                loadHistory(); // Refresh history dropdown
+            }
+
+            function loadHistory() {
+                const history = JSON.parse(localStorage.getItem('ttsKokoroHistory') || '[]');
+                historyList.innerHTML = '';
+                if (history.length === 0) {
+                    historyList.innerHTML = '<li><a class="dropdown-item disabled" href="#">No history yet...</a></li>';
+                    return;
+                }
+                history.forEach((entry, index) => {
+                    const date = new Date(entry.timestamp).toLocaleString();
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" 
+                           data-history-index="${index}" 
+                           title="Voice: ${entry.voice.split(':')[1]}, Time: ${date}">
+                           ${entry.text} <span class="badge bg-secondary ms-2">${date}</span>
+                           <i class="fas fa-redo ms-2" data-action="re-read-history"></i>
+                           <i class="fas fa-trash-alt text-danger ms-2" data-action="delete-history"></i>
+                        </a>
+                    `;
+                    historyList.appendChild(li);
+                });
+            }
+
+            historyList.addEventListener('click', function (event) {
+                const target = event.target;
+                if (target.dataset.action === 'delete-history') {
+                    event.preventDefault();
+                    event.stopPropagation(); // Prevent loading history if delete button clicked
+                    const index = target.closest('[data-history-index]').dataset.historyIndex;
+                    let history = JSON.parse(localStorage.getItem('ttsKokoroHistory') || '[]');
+                    if (confirm(`Are you sure you want to delete this history entry?`)) {
+                        history.splice(index, 1);
+                        localStorage.setItem('ttsKokoroHistory', JSON.stringify(history));
+                        loadHistory();
+                        showNotification(`History entry deleted.`, 'info');
+                    }
+                } else if (target.dataset.action === 're-read-history') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const index = target.closest('[data-history-index]').dataset.historyIndex;
+                    const history = JSON.parse(localStorage.getItem('ttsKokoroHistory') || '[]');
+                    if (history[index]) {
+                        textInput.value = history[index].fullText;
+                        voiceSelect.value = history[index].voice;
+                        charCount.textContent = `${history[index].fullText.length} characters`;
+                        saveTextToLocalStorage();
+                        updateFavoriteButton(); // Update favorite status based on re-read voice
+                        showNotification(`Loaded history entry for re-reading.`, 'info');
+                    }
+                } else if (target.dataset.historyIndex !== undefined) {
+                    event.preventDefault(); // Prevent default link behavior
+                    const index = target.dataset.historyIndex;
+                    const history = JSON.parse(localStorage.getItem('ttsKokoroHistory') || '[]');
+                    if (history[index] && history[index].audioPath) {
+                        showNotification(`Playing history: "${history[index].text}"`, 'info');
+                        playAudio(history[index].audioPath, history[index].fullText); // Play audio directly
+                    }
+                }
+            });
+
+            loadHistory(); // Load history on startup
+
+
+            // --- Keyboard Shortcuts ---
+            document.addEventListener('keydown', (e) => {
+                // Ctrl+Enter to read
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    readBtn.click();
+                }
+                // Space to play/pause
+                else if (e.key === ' ' && currentAudio) {
+                    e.preventDefault(); // Prevent scrolling
+                    playPauseBtn.click();
+                }
+                // Esc to stop
+                else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    if (isReading) {
+                        stopReading();
+                    }
+                }
+            });
+
+            // --- Batch Processing ---
+            addToBatchBtn.addEventListener('click', () => {
+                const text = textInput.value.trim();
+                const voice = voiceSelect.value;
+                const speed = speedSelect.value;
+                const outputFormat = outputFormatSelect.value;
+
+                if (!text) {
+                    showNotification("Please enter text to add to batch.", "warning");
+                    return;
+                }
+
+                batchQueue.push({ text, voice, speed, outputFormat });
+                showNotification("Text added to batch queue.", "success");
+                updateBatchQueueUI();
+                textInput.value = ''; // Clear input after adding to batch
+                charCount.textContent = `0 characters`;
+                saveTextToLocalStorage();
+            });
+
+            processBatchBtn.addEventListener('click', async () => {
+                if (batchQueue.length === 0) {
+                    showNotification("Batch queue is empty.", "warning");
+                    return;
+                }
+                showNotification("Processing batch queue...", "info", 5000);
+                processBatchBtn.disabled = true;
+                addToBatchBtn.disabled = true;
+                clearBatchBtn.disabled = true;
+
+                for (let i = 0; i < batchQueue.length; i++) {
+                    const item = batchQueue[i];
+                    updateReadingStatus(`Processing item ${i + 1}/${batchQueue.length}: ${item.text.substring(0, 50)}...`, 'fas fa-spinner fa-spin');
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UI update
+
+                    try {
+                        await generateAndPlaySpeech(item.text, item.voice, item.speed, item.outputFormat);
+                        // Wait for audio to finish playing before next item
+                        if (currentAudio) {
+                            await new Promise(resolve => currentAudio.onended = resolve);
+                        }
+                    } catch (error) {
+                        console.error(`Error processing batch item ${i + 1}:`, error);
+                        showNotification(`Failed to process item ${i + 1} in batch.`, 'error');
+                    }
+                }
+
+                batchQueue = []; // Clear queue after processing
+                updateBatchQueueUI();
+                processBatchBtn.disabled = false;
+                addToBatchBtn.disabled = false;
+                clearBatchBtn.disabled = false;
+                showNotification("Batch processing complete!", "success", 5000);
+                updateReadingStatus("Batch processing finished.", 'fas fa-check-circle');
+            });
+
+            clearBatchBtn.addEventListener('click', () => {
+                if (confirm("Are you sure you want to clear the entire batch queue?")) {
+                    batchQueue = [];
+                    updateBatchQueueUI();
+                    showNotification("Batch queue cleared.", "info");
+                }
+            });
+
+            function updateBatchQueueUI() {
+                batchQueueList.innerHTML = '';
+                if (batchQueue.length === 0) {
+                    batchQueueList.innerHTML = '<li class="text-muted">Queue is empty.</li>';
+                } else {
+                    batchQueue.forEach((item, index) => {
+                        const li = document.createElement('li');
+                        li.textContent = `${index + 1}. ${item.text.substring(0, 70)}... (Voice: ${item.voice.split(':')[1]}, Speed: ${item.speed})`;
+                        batchQueueList.appendChild(li);
+                    });
+                }
+            }
+            updateBatchQueueUI(); // Initial load of batch queue UI
+
+
+            // --- Fullscreen Mode ---
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+            function toggleFullscreen() {
+                const appContainer = document.querySelector('.app-container');
+                if (!document.fullscreenElement) {
+                    if (appContainer.requestFullscreen) {
+                        appContainer.requestFullscreen();
+                    } else if (appContainer.mozRequestFullScreen) { /* Firefox */
+                        appContainer.mozRequestFullScreen();
+                    } else if (appContainer.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                        appContainer.webkitRequestFullscreen();
+                    } else if (appContainer.msRequestFullscreen) { /* IE/Edge */
+                        appContainer.msRequestFullscreen();
+                    }
+                    document.body.classList.add('fullscreen-mode');
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) { /* Firefox */
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) { /* IE/Edge */
+                        document.msExitFullscreen();
+                    }
+                    document.body.classList.remove('fullscreen-mode');
+                }
+            }
+
+            // Helper to get CSS variable values
+            function varCss(name) {
+                return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+            }
+
+            // Initial status message
+            updateReadingStatus("Ready to generate speech.", 'fas fa-circle-check');
+            resetAudioControls(); // Ensure controls are initially hidden/disabled
+
+            // Update voice info when page loads
+            const initialSelectedOption = voiceSelect.options[voiceSelect.selectedIndex];
+            currentVoiceInfo = {
+                language: initialSelectedOption.dataset.language,
+                gender: initialSelectedOption.dataset.gender
+            };
+            const voiceInfoSpan = document.querySelector('#voiceSelect + .mt-2 .voice-info');
+            if (voiceInfoSpan) {
+                voiceInfoSpan.textContent = `(${currentVoiceInfo.language} - ${currentVoiceInfo.gender})`;
+            }
+        });
+    </script>
+</body>
+
+</html>
