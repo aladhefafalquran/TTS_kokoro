@@ -674,6 +674,10 @@
             const transcriptionStats = document.getElementById('transcriptionStats');
             const sttStatus = document.getElementById('sttStatus');
 
+            // File import elements
+            const fileImport = document.getElementById('fileImport');
+            const importFileBtn = document.getElementById('importFileBtn');
+
             // Global variables
             let currentAudio = null;
             let isReading = false;
@@ -683,6 +687,7 @@
             let recognition = null;
             let sttAvailable = false;
             let accumulatedTranscript = ''; // NEW: To store continuous transcription
+            let finalTranscriptLength = 0; // NEW: Track position of finalized text
 
             // --- Utility Functions ---
             function showNotification(message, type = 'info', duration = 3000) {
@@ -769,6 +774,27 @@
                 }
             });
 
+            // --- File Import ---
+            importFileBtn.addEventListener('click', function () {
+                fileImport.click();
+            });
+
+            fileImport.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file && file.type === 'text/plain') {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        textInput.value = e.target.result;
+                        charCount.textContent = `${textInput.value.length} characters`;
+                        saveTextToLocalStorage();
+                        showNotification('Text file imported successfully!', 'success');
+                    };
+                    reader.readAsText(file);
+                } else {
+                    showNotification('Please select a valid .txt file.', 'error');
+                }
+            });
+
             // --- NEW: Speech-to-Text Functions ---
 
             // Check STT availability
@@ -781,7 +807,6 @@
                         updateSTTStatus("STT ready - Upload audio or use microphone", 'fas fa-check-circle');
                     } else {
                         updateSTTStatus("STT (Whisper) not available. See backend console for install info.", 'fas fa-exclamation-triangle');
-                        // Disable upload and record buttons if STT is not available
                         selectAudioBtn.disabled = true;
                         recordBtn.disabled = true;
                         audioDropZone.style.pointerEvents = 'none';
@@ -886,7 +911,7 @@
                 recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
                 recognition.continuous = true;
                 recognition.interimResults = true;
-                recognition.lang = 'en-US'; // Default language, could be made dynamic
+                recognition.lang = 'en-US';
 
                 recognition.onstart = () => {
                     console.log('Speech recognition started');
@@ -896,23 +921,42 @@
                     recordingIndicator.style.display = 'inline';
                     updateSTTStatus('Recording live audio...', 'fas fa-dot-circle');
                     showNotification('Recording started.', 'info', 2000);
+                    // Reset variables when starting fresh recording
                     accumulatedTranscript = '';
+                    finalTranscriptLength = 0;
                 };
 
                 recognition.onresult = (event) => {
+                    let newFinalTranscript = '';
                     let interimTranscript = '';
-                    let finalTranscript = '';
-                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    
+                    // Process all results starting from where we left off
+                    for (let i = finalTranscriptLength; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
                         if (event.results[i].isFinal) {
-                            finalTranscript += event.results[i][0].transcript;
+                            // Add space before new sentence if there's already text
+                            if (accumulatedTranscript.trim() && transcript.trim()) {
+                                newFinalTranscript += ' ' + transcript;
+                            } else {
+                                newFinalTranscript += transcript;
+                            }
+                            finalTranscriptLength = i + 1; // Update our position
                         } else {
-                            interimTranscript += event.results[i][0].transcript;
+                            interimTranscript += transcript;
                         }
                     }
-                    transcriptionText.value = accumulatedTranscript + finalTranscript + interimTranscript;
+                    
+                    // Update accumulated transcript with new final results
+                    if (newFinalTranscript) {
+                        accumulatedTranscript += newFinalTranscript;
+                    }
+                    
+                    // Display accumulated final + current interim
+                    transcriptionText.value = accumulatedTranscript + interimTranscript;
                     transcriptionResult.style.display = 'block';
                     transcriptionStats.textContent = `${transcriptionText.value.length} characters (Live)`;
-                    // Simple language detection for live, could be improved
+                    
+                    // Language detection
                     if (event.results.length > 0 && event.results[0][0].transcript) {
                         detectedLanguage.textContent = recognition.lang.split('-')[0].toUpperCase();
                         detectedLanguage.style.display = 'inline-block';
@@ -922,12 +966,12 @@
                 recognition.onerror = (event) => {
                     console.error('Speech recognition error:', event.error);
                     showNotification(`Recording error: ${event.error}`, 'error');
-                    stopRecording(); // Stop on error
+                    stopRecording();
                 };
 
                 recognition.onend = () => {
                     console.log('Speech recognition ended');
-                    if (isRecording) { // If it ended unexpectedly while still "recording"
+                    if (isRecording) {
                         stopRecording();
                         showNotification('Recording stopped unexpectedly.', 'warning');
                     }
@@ -941,7 +985,6 @@
                 }
                 if (!isRecording) {
                     recognition.start();
-                    // Setup MediaRecorder for actual audio chunks (if needed for server-side processing later)
                     navigator.mediaDevices.getUserMedia({ audio: true })
                         .then(stream => {
                             mediaRecorder = new MediaRecorder(stream);
@@ -950,13 +993,8 @@
                                 audioChunks.push(event.data);
                             };
                             mediaRecorder.onstop = async () => {
-                                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' }); // Or appropriate type
+                                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                                 const audioFile = new File([audioBlob], 'live_recording.wav', { type: 'audio/wav' });
-                                // Optionally, send this blob to the server for Whisper transcription if needed
-                                // Currently, the live transcription uses browser's Web Speech API
-                                if (transcriptionText.value.trim()) {
-                                    accumulatedTranscript = transcriptionText.value.trim();
-                                }
                                 updateSTTStatus("Live recording finished.", 'fas fa-check-circle');
                             };
                             mediaRecorder.start();
@@ -981,15 +1019,19 @@
                     recognition.stop();
                     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
                         mediaRecorder.stop();
-                        mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Stop microphone track
+                        mediaRecorder.stream.getTracks().forEach(track => track.stop());
                     }
                     isRecording = false;
                     recordBtn.disabled = false;
                     stopRecordBtn.disabled = true;
                     recordingIndicator.style.display = 'none';
+                    
+                    // Finalize the transcript in the text area
                     if (transcriptionText.value.trim()) {
-                        accumulatedTranscript = transcriptionText.value.trim(); // Finalize transcript
+                        transcriptionText.value = transcriptionText.value.trim();
+                        accumulatedTranscript = transcriptionText.value;
                     }
+                    
                     updateSTTStatus('Recording stopped.', 'fas fa-stop-circle');
                     showNotification('Recording stopped.', 'info', 1500);
                 }
@@ -1001,7 +1043,6 @@
                     charCount.textContent = `${textInput.value.length} characters`;
                     saveTextToLocalStorage();
                     showNotification('Transcription moved to text input!', 'success');
-                    // Optionally switch to edit tab
                     const editTabButton = document.getElementById('edit-tab');
                     if (editTabButton) {
                         new bootstrap.Tab(editTabButton).show();
@@ -1269,7 +1310,7 @@
                 }
             });
 
-            // Template and History/Snippets (Placeholder - assuming existing functionality)
+            // Template functionality
             const templatesList = document.getElementById('templatesList');
             templatesList.addEventListener('click', function (e) {
                 if (e.target.tagName === 'A' && e.target.dataset.template) {
