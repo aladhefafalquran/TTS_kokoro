@@ -1,6 +1,6 @@
 Flask==2.2.2
 torch==2.0.1
 openai-whisper==20231117
-piper-tts==1.0.0
+piper-tts==1.2.0
 numpy==1.26.4
 ffmpeg-python==0.2.0
